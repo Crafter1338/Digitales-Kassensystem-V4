@@ -1,9 +1,30 @@
-import { Sheet, Typography } from '@mui/joy';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+
+import { useAuth } from './hooks/AuthContext';
+import { useNavigate } from 'react-router-dom';
+
+import Login from './pages/Login';
+import useHttp from './hooks/useHttp';
 
 export default function App() {
+    const navigate = useNavigate();
+    const auth = useAuth();
+    const http = useHttp();
+
+    useEffect(() => {
+        if (!auth.user) {
+            if (localStorage.getItem('token')) {
+                auth.loginToken();
+            } else {
+                navigate('/login');
+            }
+        }
+    }, [])
+
     return (
-        <>
-        
-        </>
+        <Routes>
+            <Route path="/login" element={<Login />} />
+        </Routes>
     );
 }
