@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 
-import { useAuth } from './hooks/AuthContext';
+import { useAuth } from './contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 import Login from './pages/Login';
@@ -15,7 +15,13 @@ export default function App() {
     useEffect(() => {
         if (!auth.user) {
             if (localStorage.getItem('token')) {
-                auth.loginToken();
+                http('post', '/action/validate', {token: localStorage.getItem('token')}).then((response) => {
+                    auth.setUser({name: response.data.username})
+                    navigate('/dashboard');
+                }).catch(() => {
+                    auth.logout();
+                    navigate('/login');
+                })
             } else {
                 navigate('/login');
             }

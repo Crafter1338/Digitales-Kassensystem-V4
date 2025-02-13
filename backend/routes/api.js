@@ -34,6 +34,8 @@ const parseQuery = (query) => {
 };
 
 router.get('/:model/fetch', async (req, res) => {
+    if (!verify(req, res)) return;
+
     const model = models[req.params.model.toLowerCase()];
     if (!model) return res.status(400).json({ error: "Invalid model" });
 

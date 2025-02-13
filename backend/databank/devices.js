@@ -41,12 +41,11 @@ class Devices {
         this.devices = [];
     }
 
-    add(req, res) {
+    add(deviceID, req, res) {
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
     
-        const deviceID = req.body.deviceID;
         let device = this.get(deviceID);
 
         if (device) {

@@ -30,5 +30,5 @@ app.use('/api', apiRoutes);
 app.use('/action', actionRoutes);
 
 app.listen(process.env.PORT, process.env.HOST, () => {
-    console.log(`Server running on http://${process.env.HOST}:${process.env.PORT}`);
+	console.log(`Server running on http://${process.env.HOST}:${process.env.PORT}`);
 });

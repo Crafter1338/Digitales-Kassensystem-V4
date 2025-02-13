@@ -1,39 +1,36 @@
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from './AuthContext';
+import axios from "axios";
+import { useAuth } from '../contexts/AuthContext';
 
 const endpoint = 'http://localhost:80';
 
 export default function useHttp() {
-	const navigate = useNavigate();
-	const auth = useAuth();
+    const auth = useAuth();
 
-	return async (method, url, data = null) => {
-		try {
-			const token = localStorage.getItem('token');
+    return (method, url, payload = null) => {
 
-			if (!token) {
-				navigate('/login');
-				return null;
-			}
+        if (!url) { return Promise.reject(new Error('No URL')) }
 
-			const config = {
-				method,
-				url: `${endpoint}${url}`,
-				headers: {
-				'Content-Type': 'application/json',
-				...{ Authorization: `Bearer ${token}` },
-				},
-				data,
-			};
+        const token = localStorage.getItem('token') || null;
 
-			const response = await axios(config);
+        let request;
+        const headers = { 
+            Authorization: `Bearer ${token}`,
+        };
 
-			return response.data;
-		} catch (error) {
-			if (error.response && error.response.status === 401) { auth.logout() }
-			
-			throw error;
-		}
-	};
+        if (method == 'post') {
+            if (!payload) { return Promise.reject(new Error('No payload')) }
+
+            request = axios.post(endpoint + url, payload, { headers });
+        } else if (method == 'get') {
+            request = axios.get(endpoint + url, { headers });
+        } else {
+            return Promise.reject(new Error('No '));
+        }
+
+        return request.catch((reason) => {
+            if (reason.response?.status === 401) { auth.logout() }
+
+            return Promise.reject(reason);
+        });
+    }
 }

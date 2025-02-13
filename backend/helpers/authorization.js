@@ -5,6 +5,7 @@ export const generateToken = (user) => {
     return jsonwebtoken.sign({
         cardUID: user.cardUID,
         authority: user.authority,
+        mongoID: user._id
     }, process.env.JWT_SECRET, {
         expiresIn: '1h',
     });

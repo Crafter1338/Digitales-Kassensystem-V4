@@ -6,7 +6,8 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import { CssBaseline } from '@mui/joy';
 import '@fontsource/inter';
 
-import { AuthProvider } from './hooks/AuthContext';
+import { AuthProvider } from './contexts/AuthContext.jsx';
+import { SnackProvider } from './contexts/SnackContext.jsx';
 
 import App from './App.jsx';
 
@@ -15,7 +16,9 @@ createRoot(document.getElementById('root')).render(
 		<CssBaseline />
 		<Router>
 			<AuthProvider>
-				<App />
+				<SnackProvider>
+					<App />
+				</SnackProvider>
 			</AuthProvider>
 		</Router>
 	</>,
