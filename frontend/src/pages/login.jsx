@@ -116,7 +116,7 @@ export default function () {
     }
 
     const handleForgotData = () => {
-        
+
     }
 
     return (
@@ -190,9 +190,11 @@ export default function () {
                             Anmelden
                         </Button>
                         
-                        <Button fullWidth variant="soft" color="danger" onClick={handleForgotData}>
+                        {
+                        /*<Button fullWidth variant="soft" color="danger" onClick={handleForgotData}>
                             Daten vergessen
-                        </Button>
+                        </Button>*/
+                        }
                     </Box>
                 </CustomCard>
 

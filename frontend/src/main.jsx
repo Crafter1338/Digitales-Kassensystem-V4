@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 
-import { CssBaseline } from '@mui/joy';
+import { CssBaseline, CssVarsProvider } from '@mui/joy';
 import '@fontsource/inter';
 
 import { AuthProvider } from './contexts/AuthContext.jsx';
@@ -13,13 +13,15 @@ import App from './App.jsx';
 
 createRoot(document.getElementById('root')).render(
 	<>
-		<CssBaseline />
-		<Router>
-			<AuthProvider>
-				<SnackProvider>
-					<App />
-				</SnackProvider>
-			</AuthProvider>
-		</Router>
+		<CssVarsProvider>
+			<CssBaseline />
+			<Router>
+				<AuthProvider>
+					<SnackProvider>
+						<App />
+					</SnackProvider>
+				</AuthProvider>
+			</Router>
+		</CssVarsProvider>
 	</>,
 );
