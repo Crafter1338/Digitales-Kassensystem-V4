@@ -38,6 +38,9 @@ export default function App() {
         <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard" element={<Dashboard />} />
+
+            <Route path="/" element={auth.user? <Navigate to="/dashboard" replace />:<Navigate to="/login" replace />} />
+            <Route path="*" element={auth.user? <Navigate to="/dashboard" replace />:<Navigate to="/login" replace />} />
         </Routes>
     );
 }

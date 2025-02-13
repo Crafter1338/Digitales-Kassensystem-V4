@@ -10,17 +10,20 @@ import { AuthProvider } from './contexts/AuthContext.jsx';
 import { SnackProvider } from './contexts/SnackContext.jsx';
 
 import App from './App.jsx';
+import { DataProvider } from './contexts/DataContext.jsx';
 
 createRoot(document.getElementById('root')).render(
 	<>
 		<CssVarsProvider>
 			<CssBaseline />
 			<Router>
-				<AuthProvider>
-					<SnackProvider>
-						<App />
-					</SnackProvider>
-				</AuthProvider>
+				<DataProvider>
+					<AuthProvider>
+						<SnackProvider>
+							<App />
+						</SnackProvider>
+					</AuthProvider>
+				</DataProvider>
 			</Router>
 		</CssVarsProvider>
 	</>,

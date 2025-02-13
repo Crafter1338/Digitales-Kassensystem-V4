@@ -131,6 +131,8 @@ export default function () {
 
                 flexDirection:'column',
                 gap:2,
+
+                overflowY: 'scroll'
             }}>
                 <CustomCard sx={{gap:1}}>
                     <Typography level="h4" sx={{textAlign:'center'}}>
@@ -144,7 +146,7 @@ export default function () {
 
                 <CustomCard>
                     <Typography level="h4">
-                        Wilkommen zurück.
+                        Wilkommen:
                     </Typography>
 
                     <FormControl>

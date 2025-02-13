@@ -36,7 +36,10 @@ export default function(){
 
             {/*right side*/}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mr: 1 }}>
-                {auth.user.name && (<Typography level="body-md">{auth.user.name}</Typography>)}
+                <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                    {/*<Typography>Eingeloggt als</Typography>*/}
+                    {auth.user.name && (<Typography level="body-md" textAlign="right">{auth.user.name}</Typography>)}
+                </Box>
 
                 <Button variant="soft" color="primary" size="sm" onClick={auth.logout}>
                     Abmelden

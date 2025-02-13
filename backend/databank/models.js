@@ -35,7 +35,7 @@ const identitySchema = new mongoose.Schema({
 });
 
 const accountSchema = new mongoose.Schema({
-    password: { type: String, required: true, unique: true },
+    name: { type: String, required: true, unique: true },
     password: { type: String, required: true },
 
     identitityID: { type: mongoose.Schema.Types.ObjectId, ref: 'Identity' }, // dont propagate to client
@@ -64,7 +64,7 @@ const itemSchema = new mongoose.Schema({
 });
 
 const eventSchema = new mongoose.Schema({
-    name: { type: String, required: true },
+    name: { type: String },
     description: { type: String },
 
     startTimestamp: { type: Date },

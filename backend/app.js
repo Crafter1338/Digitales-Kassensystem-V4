@@ -8,6 +8,7 @@ import { identityModel, accountModel, itemModel, scheduleEntryModel, eventModel,
 
 import apiRoutes from './routes/api.js';
 import actionRoutes from './routes/action.js';
+import { hashPassword } from './helpers/authorization.js';
 
 dotenv.config();
 
@@ -16,12 +17,20 @@ app.use(cors());
 app.use(bodyParser.json());
 
 mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+.connect(process.env.MONGO_URI)
+.then(() => console.log('Connected to MongoDB'))
+.catch(err => console.error('MongoDB connection error:', err));
 
 async function setupBaseData() {
+	if (! await accountModel.findOne({name: 'admin'})){
+		let admin = new accountModel({name: 'admin', password: (await hashPassword('admin')), authority: 20});
+		await admin.save();
+	}
 
+	if ( (await eventModel.find({})).length == 0){
+		let event = new eventModel({});
+		await event.save();
+	}
 }
 
 setupBaseData()
