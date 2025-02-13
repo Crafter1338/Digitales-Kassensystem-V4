@@ -22,18 +22,15 @@ export default function App() {
     }, [])
 
     useEffect(() => {
-        if (!auth.user) {
-            if (localStorage.getItem('token')) {
-                http('post', '/action/validate', {token: localStorage.getItem('token')}).then((response) => {
-                    auth.setUser({name: response.data.username})
-                    navigate('/dashboard');
-                }).catch(() => {
-                    auth.logout();
-                    navigate('/login');
-                })
-            } else {
+        if (localStorage.getItem('token')) {
+            http('post', '/action/validate', {token: localStorage.getItem('token')}).then((response) => {
+                auth.setUser({name: response.data.name})
+                
+                navigate('/dashboard');
+            }).catch(() => {
+                auth.logout();
                 navigate('/login');
-            }
+            })
         }
     }, [])
 

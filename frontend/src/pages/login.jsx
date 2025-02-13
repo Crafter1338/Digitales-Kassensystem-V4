@@ -138,7 +138,7 @@ export default function () {
                     </Typography>
 
                     <Typography sx={{textAlign:'center'}}>
-                        #Modern #RGPSMV #OneOfAKind #Crazy
+                        #RGPOnTop #RGPSMV #OneOfAKind
                     </Typography>
                 </CustomCard>
 
