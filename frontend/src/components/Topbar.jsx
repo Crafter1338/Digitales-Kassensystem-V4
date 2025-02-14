@@ -31,14 +31,13 @@ export default function(){
 
                 <Typography level="h4">SMV Kassensystem</Typography>
                 <Typography>@Nico Stickel</Typography>
-                <Typography>#RGPSMV</Typography>
             </Box>
 
             {/*right side*/}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mr: 1 }}>
                 <Box sx={{display: 'flex', flexDirection: 'column'}}>
                     {/*<Typography>Eingeloggt als</Typography>*/}
-                    {auth.user.name && (<Typography level="body-md" textAlign="right">{auth.user.name}</Typography>)}
+                    {auth?.user?.name && (<Typography level="body-md" textAlign="right">{auth.user.name}</Typography>)}
                 </Box>
 
                 <Button variant="soft" color="primary" size="sm" onClick={auth.logout}>

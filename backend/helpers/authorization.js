@@ -20,7 +20,7 @@ export const verifyToken = (token) => {
 };
 
 export const hashPassword = async (password) => {
-    return await bcrypt.hash(password, 15);
+    return await bcrypt.hash(password, 10);
 };
 
 export const comparePassword = async (password, hash) => {

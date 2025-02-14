@@ -18,8 +18,8 @@ import { useNavigate } from 'react-router-dom';
 function CustomCard({sx, ...props}) {
     return (
         <Card sx = {{
-            mx: 2,
-            maxWidth: 400,
+            mx: 'auto',
+            maxWidth: 450,
             width:1,
 
             p: 2,
@@ -96,7 +96,8 @@ export default function () {
         );
 
         http('post', '/action/login', {name: username, password}).then((response) => {
-            auth.setUser({name: username})
+            console.log(response)
+            auth.setUser({name: response.data.account.name, authority: response.data.account.authority})
             localStorage.setItem('token', response.data.token);
 
             snack.addSnack(
@@ -126,15 +127,26 @@ export default function () {
                 width:'100vw',
 
                 display:'flex',
-                alignItems:'center',
-                justifyContent:'center',
 
                 flexDirection:'column',
-                gap:2,
 
-                overflowY: 'scroll'
+                overflowY: 'auto',
+                "::-webkit-scrollbar": {
+                    display: 'none'
+                },
+
+                msOverflowStyle: 'none',
+                scrollbarWidth: 'none',
             }}>
-                <CustomCard sx={{gap:1}}>
+                <Box sx={{
+                    my: 'auto',
+                    px:2,
+                    display:'flex',
+
+                    flexDirection:'column',
+                    gap:2,
+                }}>
+                <CustomCard sx={{gap:1, mt: 2}}>
                     <Typography level="h4" sx={{textAlign:'center'}}>
                         Digitales Kassensystem
                     </Typography>
@@ -200,7 +212,7 @@ export default function () {
                     </Box>
                 </CustomCard>
 
-                <CustomCard sx={{gap:1}}>
+                <CustomCard sx={{gap:1, mb: 2}}>
                     <Typography level="h4">
                         Danke.
                     </Typography>
@@ -209,6 +221,7 @@ export default function () {
                         Dieses System wurde von @Nico Stickel für die SMV des RGPs erstellt. Vielen Dank euch allen für diese Chance.
                     </Typography>
                 </CustomCard>
+                </Box>
             </Box>
         </>
     );

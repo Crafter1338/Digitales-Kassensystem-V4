@@ -13,6 +13,7 @@ router.post("/performTransaction/:buyer/:seller", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
+    console.log('starting')
     const account = await accountModel.findOne({name: req.body.name}) 
 
     if (!account){
@@ -20,7 +21,9 @@ router.post("/login", async (req, res) => {
     }
 
     if (await comparePassword(req.body.password, account.password)){
-        return res.status(200).json({token: generateToken(account)});
+        res.status(200).json({token: generateToken(account), account: account});
+
+        return
     }
 
     return res.status(400).json({});

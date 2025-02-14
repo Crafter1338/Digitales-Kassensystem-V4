@@ -24,7 +24,7 @@ export default function App() {
     useEffect(() => {
         if (localStorage.getItem('token')) {
             http('post', '/action/validate', {token: localStorage.getItem('token')}).then((response) => {
-                auth.setUser({name: response.data.name})
+                auth.setUser({name: response.data.name, authority: response.data.authority})
                 
                 navigate('/dashboard');
             }).catch(() => {
@@ -37,7 +37,7 @@ export default function App() {
     return (
         <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard" element={auth.user? <Dashboard />:<Navigate to="/login" replace />} />
 
             <Route path="/" element={auth.user? <Navigate to="/dashboard" replace />:<Navigate to="/login" replace />} />
             <Route path="*" element={auth.user? <Navigate to="/dashboard" replace />:<Navigate to="/login" replace />} />
