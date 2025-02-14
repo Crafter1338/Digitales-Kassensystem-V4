@@ -4,9 +4,11 @@ import { Box, Card, Typography, Button, Input, FormControl, FormLabel, Sheet, Ic
 
 import MenuIcon from '@mui/icons-material/Menu';
 import { useAuth } from '../contexts/AuthContext';
+import { useNav } from '../contexts/NavContext';
 
 export default function(){
     const auth = useAuth();
+    const navbar = useNav();
 
     return (
         <Sheet
@@ -25,7 +27,7 @@ export default function(){
         >
             {/*left side*/}
             <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}>
-                <IconButton>
+                <IconButton onClick={navbar.show}>
                     <MenuIcon/>
                 </IconButton>
 

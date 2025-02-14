@@ -38,8 +38,8 @@ router.post("/validate", async (req, res) => {
 
     let verified = verifyToken(token)
     if (verified){
-        const name = (await accountModel.findById(verified.mongoID))._doc.name
-        return res.status(200).json({name});
+        const account = (await accountModel.findById(verified.mongoID))._doc
+        return res.status(200).json({account});
     }
 
     return res.status(400).json({});

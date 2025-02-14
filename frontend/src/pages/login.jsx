@@ -96,7 +96,6 @@ export default function () {
         );
 
         http('post', '/action/login', {name: username, password}).then((response) => {
-            console.log(response)
             auth.setUser({name: response.data.account.name, authority: response.data.account.authority})
             localStorage.setItem('token', response.data.token);
 
@@ -152,7 +151,7 @@ export default function () {
                     </Typography>
 
                     <Typography sx={{textAlign:'center'}}>
-                        #RGPOnTop #RGPSMV #OneOfAKind
+                        #RGPOnTop #RGPSMV #MadeWithLove
                     </Typography>
                 </CustomCard>
 

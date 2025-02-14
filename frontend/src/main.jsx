@@ -11,6 +11,7 @@ import { SnackProvider } from './contexts/SnackContext.jsx';
 
 import App from './App.jsx';
 import { DataProvider } from './contexts/DataContext.jsx';
+import { NavProvider } from './contexts/NavContext.jsx';
 
 createRoot(document.getElementById('root')).render(
 	<>
@@ -20,7 +21,9 @@ createRoot(document.getElementById('root')).render(
 				<DataProvider>
 					<AuthProvider>
 						<SnackProvider>
-							<App />
+							<NavProvider>
+								<App />
+							</NavProvider>
 						</SnackProvider>
 					</AuthProvider>
 				</DataProvider>

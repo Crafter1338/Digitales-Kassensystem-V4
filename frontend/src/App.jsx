@@ -10,11 +10,13 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard'
 
 import useHttp from './hooks/useHttp';
+import useValidate from './hooks/useValidate';
 
 export default function App() {
     const navigate = useNavigate();
     const auth = useAuth();
     const http = useHttp();
+    const validate = useValidate();
 
     const { mode, setMode } = useColorScheme();
     useEffect(() => {
@@ -22,16 +24,7 @@ export default function App() {
     }, [])
 
     useEffect(() => {
-        if (localStorage.getItem('token')) {
-            http('post', '/action/validate', {token: localStorage.getItem('token')}).then((response) => {
-                auth.setUser({name: response.data.name, authority: response.data.authority})
-                
-                navigate('/dashboard');
-            }).catch(() => {
-                auth.logout();
-                navigate('/login');
-            })
-        }
+        validate();
     }, [])
 
     return (
