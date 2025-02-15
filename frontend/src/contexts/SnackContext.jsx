@@ -27,7 +27,7 @@ export function SnackProvider({ children }) {
             <Box
                 sx={{
                     width: '100vw',
-                    height: '100vh',
+                    height: 1,
                     position: 'fixed',
                     top: 0,
                     left: 0,

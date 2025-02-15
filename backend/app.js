@@ -38,6 +38,13 @@ setupBaseData()
 app.use('/api', apiRoutes);
 app.use('/action', actionRoutes);
 
+app.use(express.static('./frontend/dist'));
+
+// Handle all unmatched routes and serve the React app
+app.get('*', (req, res) => {
+    res.sendFile('index.html', { root: './frontend/dist' });
+});
+
 app.listen(process.env.PORT, process.env.HOST, () => {
 	console.log(`Server running on http://${process.env.HOST}:${process.env.PORT}`);
 });

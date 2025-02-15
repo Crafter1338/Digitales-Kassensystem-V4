@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useAuth } from '../contexts/AuthContext';
 
-const endpoint = 'http://localhost:80';
+const endpoint = 'http://192.168.2.116:80'; //IP HERE
 
 export default function useHttp() {
     const auth = useAuth();

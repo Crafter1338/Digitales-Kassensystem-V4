@@ -21,7 +21,7 @@ export function DataProvider({ children }) {
     const http = useHttp();
 
     React.useEffect(() => {
-        const eventSource = new EventSource('http://localhost:80/action/connect/account');
+        const eventSource = new EventSource('http://192.168.2.116:80/action/connect/account'); //IP HERE
 
         eventSource.onmessage = (event) => {
             try {

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react';
 
 import { Box, Card, Typography, Button, Input, FormControl, FormLabel } from "@mui/joy";
 import Topbar from '../components/Topbar';
@@ -15,16 +15,16 @@ export default function() {
 
     useEffect(() => {
         validate();
-    }, [])
+    }, []);
 
     return (
         <Box
             sx={{
-                height:'100vh',
-                width:'100vw',
+                height: 1,
+                width: '100vw',
             }}
         >
-            <Topbar></Topbar>
+            <Topbar />
         </Box>
-    )
+    );
 }

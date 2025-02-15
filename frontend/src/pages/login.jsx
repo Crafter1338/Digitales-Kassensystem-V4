@@ -81,7 +81,7 @@ export default function () {
             }
 
             snack.addSnack(
-                <SnackMessage sx={{}} color='danger' endDecorator={<ReportIcon></ReportIcon>}>
+                <SnackMessage sx={{}} color='danger' decorator={<ReportIcon></ReportIcon>}>
                     {errorMessage + ' nicht ausgefüllt!'}
                 </SnackMessage>
             );
@@ -90,7 +90,7 @@ export default function () {
         }
 
         snack.addSnack(
-            <SnackMessage sx={{}} color='warning' endDecorator={<LoadingIcon></LoadingIcon>}>
+            <SnackMessage sx={{}} color='warning' decorator={<LoadingIcon></LoadingIcon>}>
                 Wird Angemeldet..
             </SnackMessage>
         );
@@ -100,7 +100,7 @@ export default function () {
             localStorage.setItem('token', response.data.token);
 
             snack.addSnack(
-                <SnackMessage sx={{}} color='success' endDecorator={<DoneIcon></DoneIcon>}>
+                <SnackMessage sx={{}} color='success' decorator={<DoneIcon></DoneIcon>}>
                     Erfolgreich Angemeldet!
                 </SnackMessage>
             );
@@ -108,7 +108,7 @@ export default function () {
             navigate('/dashboard')
         }).catch((e) => {
             snack.addSnack(
-                <SnackMessage sx={{}} color='danger' endDecorator={<ReportIcon></ReportIcon>}>
+                <SnackMessage sx={{}} color='danger' decorator={<ReportIcon></ReportIcon>}>
                     Falsche Eingabe!
                 </SnackMessage>
             );
@@ -122,7 +122,7 @@ export default function () {
     return (
         <>
             <Box sx={{
-                height:'100vh',
+                height:1,
                 width:'100vw',
 
                 display:'flex',
