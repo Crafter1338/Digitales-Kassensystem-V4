@@ -6,6 +6,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useAuth } from '../contexts/AuthContext';
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@emotion/react';
+import { useNavigate } from 'react-router-dom';
 
 function formatted_date() {
     const d = new Date();
@@ -30,6 +31,7 @@ export default function({ open, type }) {
 
     const [time, setTime] = useState(formatted_date(Date.now()))
     const [drawerSize, setDrawerSize] = useState('sm')
+    const navigate = useNavigate();
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -45,6 +47,11 @@ export default function({ open, type }) {
             setDrawerSize('lg');
         }
     }, [])
+
+    const handleNavigate = (location) => {
+        navbar.hide();
+        navigate(location)
+    }
 
     return (   
         <Drawer open={open} size={drawerSize}>
@@ -82,7 +89,7 @@ export default function({ open, type }) {
                     textAlign: 'left',
                     justifyContent: 'flex-start',
                     width: 1,
-                }}>
+                }} onClick={() => handleNavigate('dashboard')}>
                     Dashboard
                 </Button>
 
@@ -92,7 +99,7 @@ export default function({ open, type }) {
                     textAlign: 'left',
                     justifyContent: 'flex-start',
                     width: 1,
-                }}>
+                }} onClick={() => handleNavigate('devices')}>
                     Geräte
                 </Button>
 
@@ -108,7 +115,7 @@ export default function({ open, type }) {
                     textAlign: 'left',
                     justifyContent: 'flex-start',
                     width: 1,
-                }}>
+                }} onClick={() => handleNavigate('accounts')}>
                     Accounts
                 </Button>}
 

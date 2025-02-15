@@ -35,21 +35,21 @@ export default function App() {
 
             <Route
                 path="/dashboard"
-                element={auth.user ? <Dashboard /> : <Navigate to="/login" replace />}
+                element={<Dashboard />}
             />
             
             <Route
                 path="/accounts"
-                element={auth.user ? <Accounts /> : <Navigate to="/login" replace />}
+                element={<Accounts />}
             />
 
             <Route
                 path="/"
-                element={auth.user ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />}
+                element={<Navigate to="/dashboard" replace/>}
             />
             <Route
                 path="*"
-                element={auth.user ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />}
+                element={<Navigate to="/dashboard" replace/>}
             />
         </Routes>
     );
