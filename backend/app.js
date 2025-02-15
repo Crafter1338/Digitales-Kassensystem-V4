@@ -9,6 +9,7 @@ import { identityModel, accountModel, itemModel, scheduleEntryModel, eventModel,
 import apiRoutes from './routes/api.js';
 import actionRoutes from './routes/action.js';
 import { hashPassword } from './helpers/authorization.js';
+import { initializeCache } from './databank/cache.js';
 
 dotenv.config();
 
@@ -18,7 +19,7 @@ app.use(bodyParser.json());
 
 mongoose
 .connect(process.env.MONGO_URI)
-.then(() => console.log('Connected to MongoDB'))
+.then(() => {console.log('Connected to MongoDB'); initializeCache()})
 .catch(err => console.error('MongoDB connection error:', err));
 
 async function setupBaseData() {

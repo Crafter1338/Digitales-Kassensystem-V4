@@ -10,7 +10,8 @@ class Streaming {
         res.setHeader("Cache-Control", "no-cache");
         res.setHeader("Connection", "keep-alive");
 
-        res.write("event: connected\ndata: {}\n\n");
+        const cache = JSON.stringify(getCache());
+        res.write(`data: ${cache}\n\n`);
 
         const subscriber = { req, res };
         this.subscribers.push(subscriber);
@@ -24,7 +25,7 @@ class Streaming {
         const cache = JSON.stringify(getCache());
 
         this.subscribers.forEach(({ res }) => {
-            res.write(`event: cacheUpdate\ndata: ${cache}\n\n`);
+            res.write(`data: ${cache}\n\n`);
         });
     }
 }

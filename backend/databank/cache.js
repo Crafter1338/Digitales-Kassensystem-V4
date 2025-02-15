@@ -39,7 +39,7 @@ export const initializeCache = async () => {
             cache[cacheKey] = await model.find().lean();
         }
 
-        cache.devices = devices.get()
+        cache.devices = devices.getAll()
 
         console.log("Cache initialized.");
     } catch (error) {

@@ -96,7 +96,7 @@ export default function () {
         );
 
         http('post', '/action/login', {name: username, password}).then((response) => {
-            auth.setUser({name: response.data.account.name, authority: response.data.account.authority})
+            auth.setName(username);
             localStorage.setItem('token', response.data.token);
 
             snack.addSnack(

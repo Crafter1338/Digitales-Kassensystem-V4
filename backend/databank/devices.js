@@ -71,7 +71,7 @@ class Devices {
     }
 
     getAll () {
-        return this.devices || [];
+        return this.devices;
     }
 }
 

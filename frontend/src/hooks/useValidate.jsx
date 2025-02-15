@@ -11,7 +11,7 @@ export default function useValidate () {
         let promise;
         if (localStorage.getItem('token')) {
             promise = http('post', '/action/validate', {token: localStorage.getItem('token')}).then((response) => {
-                auth.setUser({name: response.data.account.name, authority: response.data.account.authority})
+                auth.setName(response.data.account.name)
             }).catch(() => {
                 auth.logout();
                 navigate('/login');
