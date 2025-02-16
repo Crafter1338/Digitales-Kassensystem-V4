@@ -1,34 +1,27 @@
-import axios from "axios";
-import { useAuth } from '../contexts/AuthContext';
+import axios from 'axios';
+import APIEndpoint from '../API'
 
-const endpoint = 'http://192.168.2.116:80'; //IP HERE
-
-export default function useHttp() {
-    const auth = useAuth();
-
-    return (method, url, payload = null) => {
-
+export function useHttp() {
+    return (method, url, payload) => {
         if (!url) { return Promise.reject(new Error('No URL')) }
-
-        const token = localStorage.getItem('token') || null;
 
         let request;
         const headers = { 
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
         };
 
         if (method == 'post') {
             if (!payload) { return Promise.reject(new Error('No payload')) }
 
-            request = axios.post(endpoint + url, payload, { headers });
+            request = axios.post(APIEndpoint + url, payload, { headers });
         } else if (method == 'get') {
-            request = axios.get(endpoint + url, { headers });
+            request = axios.get(APIEndpoint + url, { headers });
         } else {
-            return Promise.reject(new Error('No '));
+            return Promise.reject(new Error('No method'));
         }
 
         return request.catch((reason) => {
-            if (reason.response?.status === 401) { auth.logout() }
+            if (reason.response?.status === 401) { user.abandon() }
 
             return Promise.reject(reason);
         });

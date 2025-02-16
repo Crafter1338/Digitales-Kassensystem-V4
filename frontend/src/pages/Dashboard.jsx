@@ -1,25 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useSidebar, useServerData, useMessage, useUser, useViewport, useHttp, useAuthenticate } from '../Hooks'
 
-import { Box, Card, Typography, Button, Input, FormControl, FormLabel } from "@mui/joy";
+import { Box } from "@mui/joy";
 import Topbar from '../components/Topbar';
 
-import { useNavigate } from 'react-router-dom';
-
-import useHttp from '../hooks/useHttp';
-import useValidate from '../hooks/useValidate';
-
 export default function() {
-    const validate = useValidate();
+    const authenticate = useAuthenticate();
+    const user = useUser();
 
     useEffect(() => {
-        validate();
+        authenticate();
     }, []);
 
     return (
         <Box
             sx={{
                 height: 1,
-                width: '100vw',
+                width: 1,
             }}
         >
             <Topbar />

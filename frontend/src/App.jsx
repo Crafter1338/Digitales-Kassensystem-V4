@@ -1,37 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate, useNavigate } from 'react-router-dom';
-import { Box } from '@mui/joy';
-import { useColorScheme } from '@mui/joy/styles';
+import { Navigate, Route, Routes } from "react-router-dom";
+import { useSidebar, useServerData, useMessage, useUser, useViewport, useHttp, useAuthenticate } from './Hooks'
 
-import { useAuth } from './contexts/AuthContext';
-
-import Login from './pages/Login';
+import LoginPage from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import Accounts from './pages/Accounts.jsx'
+import Accounts from './pages/Accounts';
 
-import useHttp from './hooks/useHttp';
-import useValidate from './hooks/useValidate';
+import { useColorScheme } from "@mui/joy";
+import { useEffect } from "react";
 
-export default function App() {
-    const navigate = useNavigate();
-    const auth = useAuth();
-    const http = useHttp();
-    const validate = useValidate();
-    const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
-
+export default function() {
     const { mode, setMode } = useColorScheme();
+    const user = useUser();
 
     useEffect(() => {
         setMode('system');
     }, []);
 
-    useEffect(() => {
-        validate();
-    }, []);
-
     return (
         <Routes>
-            <Route path="/login" element={<Login />} />
+            <Route
+                path="/login"
+                element={<LoginPage />}
+            />
 
             <Route
                 path="/dashboard"
@@ -42,6 +32,7 @@ export default function App() {
                 path="/accounts"
                 element={<Accounts />}
             />
+
 
             <Route
                 path="/"

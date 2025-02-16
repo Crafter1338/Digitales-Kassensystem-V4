@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from "react";
+import { useServerData, useMessage, useUser, useViewport, useHttp, useAuthenticate } from '../Hooks'
 
-import { Box, Card, Typography, Button, Input, FormControl, FormLabel, Sheet, IconButton, Drawer, ModalClose, Divider, CardActions, Table, Stack, ListItem } from "@mui/joy";
-import { useNav } from '../contexts/NavContext';
+import { Drawer, Box, Typography, Card, IconButton, Divider, Button, Table, CardActions } from '@mui/joy'
 import CloseIcon from '@mui/icons-material/Close';
-import { useAuth } from '../contexts/AuthContext';
-import { useMediaQuery } from '@mui/material';
-import { useTheme } from '@emotion/react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+
+const SidebarContext = createContext(null);
 
 function formatted_date() {
     const d = new Date();
@@ -14,24 +13,15 @@ function formatted_date() {
            d.getMinutes().toString().padStart(2, '0')
 }
 
-function StatusModal({ open }) {
-    return (
-        <Modal>
 
-        </Modal>
-    );
-}
-
-export default function({ open, type }) {
-    const theme = useTheme();
-    const navbar = useNav();
-    const auth = useAuth();
-
-    const isSm = useMediaQuery(theme.breakpoints.down('sm'));
+function Sidebar({ open }) {
+    const viewport = useViewport();
+    const user = useUser();
 
     const [time, setTime] = useState(formatted_date(Date.now()))
     const [drawerSize, setDrawerSize] = useState('sm')
     const navigate = useNavigate();
+    const sidebar = useSidebar();
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -43,18 +33,19 @@ export default function({ open, type }) {
 
     useEffect(() => {
         setDrawerSize('sm')
-        if (isSm) {
+
+        if (viewport.isSm) {
             setDrawerSize('lg');
         }
     }, [])
 
     const handleNavigate = (location) => {
-        navbar.hide();
+        sidebar.hide();
         navigate(location)
     }
 
-    return (   
-        <Drawer open={open} size={drawerSize}>
+    return (
+<Drawer open={open} size={drawerSize}>
             <Box sx={{
                 m:2,
 
@@ -64,7 +55,7 @@ export default function({ open, type }) {
             }}>
                 <Box sx={{display:'inline-flex', flexDirection:'row', alignContent:'center'}}>
                     <Typography level='h4' sx={{width:1}}>Navigation</Typography>
-                    <IconButton size='sm' onClick={navbar.hide}><CloseIcon/></IconButton>
+                    <IconButton size='sm' onClick={sidebar.hide}><CloseIcon/></IconButton>
                 </Box>
 
                 <Divider/>
@@ -111,7 +102,7 @@ export default function({ open, type }) {
                     Hilferufe
                 </Button>
 
-                {type && type > 10 && <Button variant='soft' color='neutral' sx={{ // mind. 10
+                {user.current?.authority && user.current.authority > 10 && <Button variant='soft' color='neutral' sx={{ // mind. 10
                     textAlign: 'left',
                     justifyContent: 'flex-start',
                     width: 1,
@@ -119,7 +110,7 @@ export default function({ open, type }) {
                     Accounts
                 </Button>}
 
-                {type && type >= 10 && <Button variant='soft' color='neutral' sx={{ // mind. 10
+                {user.current?.authority && user.current.authority >= 10 && <Button variant='soft' color='neutral' sx={{ // mind. 10
                     textAlign: 'left',
                     justifyContent: 'flex-start',
                     width: 1,
@@ -127,7 +118,7 @@ export default function({ open, type }) {
                     Identitäten
                 </Button>}
 
-                {type && type >= 10 && <Button variant='soft' color='neutral' sx={{ // mind. 10
+                {user.current?.authority && user.current.authority >= 10 && <Button variant='soft' color='neutral' sx={{ // mind. 10
                     textAlign: 'left',
                     justifyContent: 'flex-start',
                     width: 1,
@@ -135,7 +126,7 @@ export default function({ open, type }) {
                     Inventar
                 </Button>}
 
-                {type && type >= 10 && <Button variant='soft' color='neutral' sx={{ // mind. 10
+                {user.current?.authority && user.current.authority >= 10 && <Button variant='soft' color='neutral' sx={{ // mind. 10
                     textAlign: 'left',
                     justifyContent: 'flex-start',
                     width: 1,
@@ -143,9 +134,9 @@ export default function({ open, type }) {
                     Schichteditor
                 </Button>}
 
-                {type && type >= 10 && <Divider />}
+                {user.current?.authority && user.current.authority >= 10 && <Divider />}
 
-                {type && type >= 10 && <Button variant='soft' color='danger' sx={{ // mind. 10
+                {user.current?.authority && user.current.authority >= 10 && <Button variant='soft' color='danger' sx={{ // mind. 10
                     textAlign: 'left',
                     justifyContent: 'flex-start',
                     width: 1,
@@ -153,7 +144,7 @@ export default function({ open, type }) {
                     Transaktionen
                 </Button>}
 
-                {type && type >= 12 && <Button variant='soft' color='danger' sx={{ // mind. 12
+                {user.current?.authority && user.current.authority >= 12 && <Button variant='soft' color='danger' sx={{ // mind. 12
                     textAlign: 'left',
                     justifyContent: 'flex-start',
                     width: 1,
@@ -168,7 +159,7 @@ export default function({ open, type }) {
                             <Typography level='title-lg' sx={{width:1}}>Account:</Typography>
                             <Typography level='title-lg' sx={{textAlign:'right', width:1}}>{time} Uhr</Typography>
                         </Box>
-                        <Typography level='title-md'>{auth.user?.name}</Typography>
+                        <Typography level='title-md'>{user.current?.name}</Typography>
                     </Box>
 
                     <Box sx={{display: { sm: 'none', xs: 'none', md: 'none', lg: 'block' }}}>
@@ -182,8 +173,8 @@ export default function({ open, type }) {
 
                             <tbody>
                                 <tr>
-                                    <td>{auth.user?.identity || '-'}</td>
-                                    <td>{auth.user?.authority}</td>
+                                    <td>{user.current?.identity || '-'}</td>
+                                    <td>{user.current?.authority}</td>
                                 </tr>
                             </tbody>
                         </Table>
@@ -220,4 +211,27 @@ export default function({ open, type }) {
             </Box>
         </Drawer>
     );
+}
+
+export function SidebarProvider({ children }) {
+    const [open, setOpen] = useState(false);
+    
+    const show = () => {
+        setOpen(true);
+    }
+
+    const hide = () => {
+        setOpen(false);
+    }
+
+    return (
+        <SidebarContext.Provider value={{ setOpen, show, hide }}>
+            {children}
+            <Sidebar open={open}/>
+        </SidebarContext.Provider>
+    );
+}
+
+export function useSidebar() {
+    return useContext(SidebarContext);
 }

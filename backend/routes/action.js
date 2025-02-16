@@ -1,5 +1,6 @@
 import express from "express";
-import streaming from "../databank/streaming.js";
+import dataStreaming from "../databank/streaming.js";
+import helpStreaming from "../databank/streaming.js";
 
 import devices from "../databank/devices.js";
 import { identityModel, accountModel, itemModel, transactionEntryModel } from "../databank/models.js";
@@ -45,12 +46,22 @@ router.post("/validate", async (req, res) => {
     return res.status(400).json({});
 });
 
-router.get("/connect/device/:id", (req, res) => {
+router.get("/connect/device/:id", async (req, res) => {
     devices.add(Number(req.params.id), req, res);
 });
 
-router.get("/connect/account", (req, res) => {
-    streaming.subscribe(req, res);
+router.post("/help", async (req, res) => {
+    helpStreaming.notifySubscribers(req.body.user, req.body.message)
+})
+
+router.get("/connect/account/:type/", async (req, res) => {
+    if (req.params.type == 'data') {
+        dataStreaming.subscribe(req, res);
+    }
+
+    if (req.params.type == 'help') {
+        helpStreaming.subscribe(req, res);
+    }
 });
 
 export default router;

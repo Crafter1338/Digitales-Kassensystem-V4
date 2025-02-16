@@ -1,22 +1,23 @@
-import React from 'react'
+import { Box, Card, Typography, Button, Sheet, IconButton } from "@mui/joy";
+import { Menu } from '@mui/icons-material';
 
-import { Box, Card, Typography, Button, Input, FormControl, FormLabel, Sheet, IconButton } from "@mui/joy";
-import MenuIcon from '@mui/icons-material/Menu';
-import { useAuth } from '../contexts/AuthContext';
-import { useNav } from '../contexts/NavContext';
+import { useSidebar, useServerData, useMessage, useUser, useViewport, useHttp, useAuthenticate } from '../Hooks'
 
 export default function() {
-    const auth = useAuth();
-    const navbar = useNav();
+    const sidebar = useSidebar();
+    const user    = useUser();
+    const message = useMessage();
 
     return (
         <Sheet
             sx={{
-                width: 'auto',
-                p: 2,
+                width: 1,
                 display: 'flex',
+                p: 2,
+
                 justifyContent: 'space-between',
                 alignItems: 'center',
+
                 borderBottomLeftRadius: 8,
                 borderBottomRightRadius: 8,
                 boxShadow: 'md',
@@ -24,8 +25,8 @@ export default function() {
         >
             {/* Left side */}
             <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}>
-                <IconButton onClick={navbar.show}>
-                    <MenuIcon />
+                <IconButton onClick={sidebar.show}>
+                    <Menu />
                 </IconButton>
 
                 <Typography
@@ -58,14 +59,14 @@ export default function() {
             {/* Right side */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mr: 1 }}>
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                    {auth?.user?.name && (
+                    {user.current?.name && (
                         <Typography level="body-md" textAlign="right">
-                            {auth.user.name}
+                            {user.current.name}
                         </Typography>
                     )}
                 </Box>
 
-                <Button variant="soft" color="primary" size="sm" onClick={auth.logout}>
+                <Button variant="soft" color="primary" size="sm" onClick={() => {user.abandon(); message.write('Erfolgreich abgemeldet', 'success', 2500)}}>
                     Abmelden
                 </Button>
             </Box>

@@ -1,18 +1,8 @@
-import React from 'react'
+import { useEffect, useState } from 'react';
+import { useSidebar, useServerData, useMessage, useUser, useViewport, useHttp, useAuthenticate } from '../Hooks'
 
-import { Box, Card, Typography, Button, Input, FormControl, FormLabel, IconButton } from "@mui/joy";
-
-import VisibilityOn from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
-
-import ReportIcon from '@mui/icons-material/Report';
-import DoneIcon from '@mui/icons-material/Done';
-import LoadingIcon from '@mui/icons-material/Cached';
-
-import { useSnack } from '../contexts/SnackContext';
-import SnackMessage from '../components/SnackMessage';
-import { useAuth } from '../contexts/AuthContext';
-import useHttp from '../hooks/useHttp';
+import { Box, Card, Typography, FormControl, FormLabel, Input, IconButton, Button } from "@mui/joy";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from 'react-router-dom';
 
 function CustomCard({sx, ...props}) {
@@ -32,86 +22,73 @@ function CustomCard({sx, ...props}) {
     );
 }
 
-export default function () {
-    const [username, setUsername] = React.useState('');
-    const [password, setPassword] = React.useState('');
+export default function() {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
 
-    const [errors, setErrors] = React.useState({
+    const [mistakes, setMistakes] = useState({
         username: false,
         password: false
     });
 
-    const snack = useSnack();
-    const auth  = useAuth();
-    const http  = useHttp();
+    const user = useUser();
     const navigate = useNavigate();
-
-    const [showPassword, setShowPassword] = React.useState(false);
+    const http = useHttp();
+    const message = useMessage();
+    const authenticate = useAuthenticate();
 
     const handleUsernameChange = (e) => {
         setUsername((e.target.value).toLowerCase());
 
-        if (errors.username) {
-            setErrors(prev => ({...prev, username: false}));
+        if (mistakes.username) {
+            setMistakes(prev => ({...prev, username: false}));
         }
     };
 
     const handlePasswordChange = (e) => {
         setPassword(e.target.value);
 
-        if (errors.password) {
-            setErrors(prev => ({...prev, password: false}));
+        if (mistakes.password) {
+            setMistakes(prev => ({...prev, password: false}));
         }
     };
 
     const handleSignIn = () => {
         let validated = [true, true, true]
-        if (username.length == 0) { setErrors(prev => ({...prev, username: true})); validated[0] = false; validated[1] = false }
-        if (password.length == 0) { setErrors(prev => ({...prev, password: true})); validated[0] = false; validated[2] = false }
+        if (username.length == 0) { setMistakes(prev => ({...prev, username: true})); validated[0] = false; validated[1] = false }
+        if (password.length == 0) { setMistakes(prev => ({...prev, password: true})); validated[0] = false; validated[2] = false }
 
         if (!validated[0]) {
             let errorMessage = '';
+
             if (!validated[1]){
                 errorMessage += 'Benutzername';
             }
+
             if (!validated[2]){
                 if (!validated[1]){ errorMessage += ' und '}
 
                 errorMessage += 'Passwort';
             }
 
-            snack.addSnack(
-                <SnackMessage sx={{}} color='danger' decorator={<ReportIcon></ReportIcon>}>
-                    {errorMessage + ' nicht ausgefüllt!'}
-                </SnackMessage>
-            );
+            message.write(errorMessage + ' nicht ausgefüllt', 'danger', 2500);
 
             return;
         }
 
-        snack.addSnack(
-            <SnackMessage sx={{}} color='warning' decorator={<LoadingIcon></LoadingIcon>}>
-                Wird Angemeldet..
-            </SnackMessage>
-        );
+        message.write('Wird angemeldet...', 'warning', 1500);
 
         http('post', '/action/login', {name: username, password}).then((response) => {
-            auth.setName(username);
             localStorage.setItem('token', response.data.token);
+            user.use(username);
 
-            snack.addSnack(
-                <SnackMessage sx={{}} color='success' decorator={<DoneIcon></DoneIcon>}>
-                    Erfolgreich Angemeldet!
-                </SnackMessage>
-            );
+            message.write('Erfolgreich angemeldet', 'success', 2500);
 
             navigate('/dashboard')
         }).catch((e) => {
-            snack.addSnack(
-                <SnackMessage sx={{}} color='danger' decorator={<ReportIcon></ReportIcon>}>
-                    Falsche Eingabe!
-                </SnackMessage>
-            );
+            console.log(e);
+            message.write('Falsche Eingabe', 'danger', 2500);
         })
     }
 
@@ -119,32 +96,35 @@ export default function () {
 
     }
 
-    return (
-        <>
-            <Box sx={{
-                height:1,
-                width:'100vw',
+    useEffect(() => {
+        authenticate().then(() => navigate('dashboard'));
+    }, []);
 
+    return (
+        <Box sx={{
+            height:1,
+            width:1,
+
+            display:'flex',
+
+            flexDirection:'column',
+
+            overflowY: 'auto',
+            "::-webkit-scrollbar": {
+                display: 'none'
+            },
+
+            msOverflowStyle: 'none',
+            scrollbarWidth: 'none',
+        }}>
+            <Box sx={{
+                my: 'auto',
+                px:2,
                 display:'flex',
 
                 flexDirection:'column',
-
-                overflowY: 'auto',
-                "::-webkit-scrollbar": {
-                    display: 'none'
-                },
-
-                msOverflowStyle: 'none',
-                scrollbarWidth: 'none',
+                gap:2,
             }}>
-                <Box sx={{
-                    my: 'auto',
-                    px:2,
-                    display:'flex',
-
-                    flexDirection:'column',
-                    gap:2,
-                }}>
                 <CustomCard sx={{gap:1, mt: 2}}>
                     <Typography level="h4" sx={{textAlign:'center'}}>
                         Digitales Kassensystem
@@ -162,10 +142,10 @@ export default function () {
 
                     <FormControl>
                         <FormLabel>
-                            <Typography color={errors.username? 'danger':'neutral'}>{errors.username? 'Benutzername *':'Benutzername'}</Typography>
+                            <Typography color={mistakes.username? 'danger':'neutral'}>{mistakes.username? 'Benutzername *':'Benutzername'}</Typography>
                         </FormLabel>
                         <Input
-                            color={errors.username? 'danger':'neutral'} 
+                            color={mistakes.username? 'danger':'neutral'} 
                             fullWidth 
                             type="text" 
                             value={username} 
@@ -175,17 +155,17 @@ export default function () {
 
                     <FormControl>
                         <FormLabel>
-                            <Typography color={errors.password? 'danger':'neutral'}>{errors.password? 'Passwort *':'Passwort'}</Typography>
+                            <Typography color={mistakes.password? 'danger':'neutral'}>{mistakes.password? 'Passwort *':'Passwort'}</Typography>
                         </FormLabel>
                         <Input
-                            color={errors.password? 'danger':'neutral'}
+                            color={mistakes.password? 'danger':'neutral'}
                             fullWidth
                             type={showPassword ? "text" : "password"}
                             endDecorator={
                                 <IconButton
                                     onClick={() => setShowPassword((prev) => !prev)}
                                 >
-                                    {showPassword? <VisibilityOff /> : <VisibilityOn />}
+                                    {showPassword? <VisibilityOff /> : <Visibility />}
                                 </IconButton>
                             }
                             value={password}
@@ -220,8 +200,7 @@ export default function () {
                         Dieses System wurde von @Nico Stickel für die SMV des RGPs erstellt. Vielen Dank euch allen für diese Chance.
                     </Typography>
                 </CustomCard>
-                </Box>
             </Box>
-        </>
+        </Box>
     );
 }
