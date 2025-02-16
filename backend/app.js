@@ -24,7 +24,7 @@ mongoose
 
 async function setupBaseData() {
 	if (! await accountModel.findOne({name: 'admin'})){
-		let admin = new accountModel({name: 'admin', password: (await hashPassword('admin')), authority: 20});
+		let admin = new accountModel({name: 'admin', password: (await hashPassword('admin')), authority: 30});
 		await admin.save();
 	}
 
@@ -32,6 +32,8 @@ async function setupBaseData() {
 		let event = new eventModel({});
 		await event.save();
 	}
+
+	initializeCache();
 }
 
 setupBaseData()

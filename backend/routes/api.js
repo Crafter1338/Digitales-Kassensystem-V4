@@ -127,6 +127,7 @@ router.post('/:model/delete_one/:query', async (req, res) => {
 });
 
 router.post('/:model/delete_many/:query', async (req, res) => {
+    console.log(parseQuery(req.params.query))
     if (!verify(req, res)) return;
     
     const model = models[req.params.model.toLowerCase()];
