@@ -31,7 +31,6 @@ const identitySchema = new mongoose.Schema({
     ],
 
     status: { type: String },
-    authority: { type: Number, required: true },
 });
 
 const accountSchema = new mongoose.Schema({

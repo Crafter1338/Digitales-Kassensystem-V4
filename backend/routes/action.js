@@ -4,7 +4,7 @@ import helpStreaming from "../databank/streaming.js";
 
 import devices from "../databank/devices.js";
 import { identityModel, accountModel, itemModel, transactionEntryModel } from "../databank/models.js";
-import { reloadCacheForModel } from "../databank/cache.js";
+import { reloadCacheForModel, reloadDevices } from "../databank/cache.js";
 import { comparePassword, generateToken, verifyToken } from "../helpers/authorization.js";
 
 const router = express.Router();
@@ -46,10 +46,6 @@ router.post("/validate", async (req, res) => {
     return res.status(400).json({});
 });
 
-router.get("/connect/device/:id", async (req, res) => {
-    devices.add(Number(req.params.id), req, res);
-});
-
 router.post("/help", async (req, res) => {
     helpStreaming.notifySubscribers(req.body.user, req.body.message)
 })
@@ -62,6 +58,32 @@ router.get("/connect/account/:type/", async (req, res) => {
     if (req.params.type == 'help') {
         helpStreaming.subscribe(req, res);
     }
+});
+
+
+router.post('/scan/:id/:cardID', async (req, res) => {
+    res.status(200).send(JSON.stringify({}));
+
+    console.log(req.params.cardID)
+
+    let device = devices.get(Number(req.params.id))
+    device.currentCardID = Number(req.params.cardID);
+
+    console.log(device)
+    device.trigger();
+
+    if (device.mode == 0) {
+        try {
+            let newIdentity = new identityModel({cardID: req.params.cardID});
+            await newIdentity.save();
+        } catch {}
+    }
+
+    reloadDevices();
+})
+
+router.get("/connect/device/:id", async (req, res) => {
+    devices.add(Number(req.params.id), req, res);
 });
 
 export default router;

@@ -32,7 +32,7 @@ class Device {
     }
 
     sendData (data) {
-        this.res.send(`data: ${JSON.stringify(data)}\n\n`);
+        this.res.write(`data: ${JSON.stringify(data)}\n\n`);
     }
 }
 
@@ -45,7 +45,7 @@ class Devices {
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
-    
+
         let device = this.get(deviceID);
 
         if (device) {
@@ -63,11 +63,11 @@ class Devices {
     }
 
     remove (deviceID) {
-        this.devices = this.devices.filter(device => device.deviceID !== deviceID);
+        this.devices = this.devices.filter(device => device.deviceID != deviceID);
     }
 
     get (deviceID) {
-        return this.devices.find(device => device.deviceID === deviceID) || null; 
+        return this.devices.find(device => device.deviceID == deviceID) || null; 
     }
 
     getAll () {
