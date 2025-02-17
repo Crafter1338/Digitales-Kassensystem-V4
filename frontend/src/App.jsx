@@ -7,6 +7,7 @@ import Accounts from './pages/Accounts';
 
 import { useColorScheme } from "@mui/joy";
 import { useEffect } from "react";
+import Identities from "./pages/Identities";
 
 export default function() {
     const { mode, setMode } = useColorScheme();
@@ -31,6 +32,11 @@ export default function() {
             <Route
                 path="/accounts"
                 element={<Accounts />}
+            />
+
+            <Route
+                path="/identities"
+                element={<Identities />}
             />
 
 

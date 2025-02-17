@@ -1,7 +1,7 @@
 import express from 'express';
 import { identityModel, accountModel, itemModel, scheduleEntryModel, eventModel, logEntryModel, transactionEntryModel }  from '../databank/models.js';
 
-import { verifyToken } from "../helpers/authorization.js";
+import { hashPassword, verifyToken } from "../helpers/authorization.js";
 import { reloadCacheForModel } from '../databank/cache.js';
 
 const router = express.Router();
@@ -55,6 +55,10 @@ router.post('/:model/new', async (req, res) => {
     if (!model) return res.status(400).json({ error: "Invalid model" });
     
     try {
+        console.log(req.body)
+
+        req.body.password = await hashPassword(req.body.password);
+
         const instance = new model(req.body);
         await instance.save();
         await reloadCacheForModel(model);
@@ -95,6 +99,10 @@ router.post('/:model/update_many/:query', async (req, res) => {
     const query = parseQuery(req.params.query);
     if (!query) return res.status(400).json({ error: "Invalid query format" });
     
+    if (req.body.password.length == 0) {
+        delete req.body.password;;
+    }
+
     try {
         await model.updateMany(query, req.body);
         await reloadCacheForModel(model);

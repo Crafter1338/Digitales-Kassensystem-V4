@@ -12,7 +12,6 @@ export function UserProvider({ children }) {
     const navigate = useNavigate();
 
     useEffect(() => {
-        console.log(serverData.accounts);
         setUser(serverData.accounts.find(account => account._id == currentID));
     }, [serverData])
 

@@ -29,8 +29,6 @@ export function ServerDataProvider({ children }) {
                 setScheduleEntries(data.scheduleEntries);
                 setLogs(data.logs);
                 setEvent(data.events[0]);
-
-                console.log(data)
             } catch (error) {
                 console.error("Failed to process SSE message:", error);
             }
