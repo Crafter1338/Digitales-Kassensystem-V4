@@ -1,25 +1,47 @@
 import { useEffect, useState } from 'react';
 import { useSidebar, useServerData, useMessage, useUser, useViewport, useHttp, useAuthenticate } from '../Hooks'
 
-import { Box, Button, Card, Checkbox, IconButton, Input, Tab, Table, TabList, TabPanel, Tabs, Typography } from "@mui/joy";
+import { Box, Button, Card, Checkbox, IconButton, Input, Modal, ModalDialog, Tab, Table, TabList, TabPanel, Tabs, Typography } from "@mui/joy";
 import Topbar from '../components/Topbar';
 
 import { Add } from '@mui/icons-material'
 import { width } from '@mui/system';
 
-function EditModal() {
-
-}
-
-function CustomTabPanel({ value, selectAll, accounts, setSelected, selected, toggleSelection }) {
+function CustomTabPanel({ value, accounts, nID }) {
     const [filteredAccounts, setFilteredAccounts] = useState(accounts);
+    const [selected, setSelected] = useState([]);
 
     const [nameFilter, setNameFilter] = useState('');
     const [identityFilter, setIdentityFilter] = useState('');
 
-    const [edit, setEdit] = useState();
+    const [editedDate, setEditedData] = useState();
+    const [showEdit, setShowEdit] = useState(false);
+
+    const authenticate = useAuthenticate();
+    const user = useUser();
+    const http = useHttp();
+    const viewport = useViewport();
+    const serverData = useServerData();
+
+    const toggleSelection = (account) => {
+        setSelected((prevSelected) =>
+            prevSelected.includes(account)
+                ? prevSelected.filter((item) => item !== account)
+                : [...prevSelected, account]
+        );
+    };
+
+    const selectAll = (accounts) => {
+        if (accounts.every((account) => selected.includes(account))) {
+            setSelected([]);
+        } else {
+            setSelected(accounts);
+        }
+    };
 
     const handleDelete = () => {
+        if (selected.length == 0) { return }
+
         const accountIds = selected.map(account => account._id);
         const query = JSON.stringify({ _id: { $in: accountIds } });
 
@@ -29,7 +51,10 @@ function CustomTabPanel({ value, selectAll, accounts, setSelected, selected, tog
     }
 
     const handleEdit = () => {
-        setEdit(selected[0]);
+        if (selected.length == 0) { return }
+
+        setEditedData(selected[0]);
+        setShowEdit(true);
     }
 
     const performEdit = () => {
@@ -65,6 +90,40 @@ function CustomTabPanel({ value, selectAll, accounts, setSelected, selected, tog
 
     return (
         <TabPanel sx={{p:0, mt:2, mb:2 }} value={value}>
+            <Modal open={showEdit} onClose={() => setShowEdit(false)}>
+                <ModalDialog>
+                    <Typography level='h4'>{selected.length} Benutzer bearbeiten:</Typography>
+                    
+                    <Box sx={{display:'flex', flexDirection:'row', gap:2}}>
+                        <Box sx={{display:'flex', flexDirection:'column', gap:1}}>
+                            <Box sx={{display:'flex', flexDirection:'row', gap:1, alignItems:'center'}}>
+                                <Typography sx={{flex:1}}>Name:</Typography>
+                                <Input sx={{flex:1}} value={editedDate?.name}></Input>
+                            </Box>
+
+                            <Box sx={{display:'flex', flexDirection:'row', gap:1, alignItems:'center'}}>
+                                <Typography sx={{flex:1}}>Identität:</Typography>
+                                <Input sx={{flex:1}} value={editedDate?.identity}></Input>
+                            </Box>
+
+                            <Box sx={{display:'flex', flexDirection:'row', gap:1, alignItems:'center'}}>
+                                <Typography sx={{flex:1}}>Authorität:</Typography>
+                                <Input sx={{flex:1}} value={editedDate?.authority}></Input>
+                            </Box>
+                        </Box>
+
+                        <Box sx={{display:'flex', flexDirection:'column', gap:1}}>
+                            <Box sx={{display:'flex', flexDirection:'row', gap:1, alignItems:'center'}}>
+                                <Typography sx={{flex:1}}>Pizza:</Typography>
+                                <Input sx={{flex:1}} value={'muss noch gemacht werden'}></Input>
+                            </Box>
+                        </Box>
+                    </Box>
+
+
+                </ModalDialog>
+            </Modal>
+
             <Box sx={{m: 0, p: 0, mx: 2, height:1, display:'flex', flexDirection:'column'}}>
                 <Box sx={{display:'flex', flexDirection:'row', gap:1 }}>
                     <Input sx={{flex:1}} placeholder='Name filtern' onChange={(e) => setNameFilter(e.target.value)} value={nameFilter}></Input>
@@ -109,7 +168,7 @@ function CustomTabPanel({ value, selectAll, accounts, setSelected, selected, tog
                         <Typography sx={{flex:1}}>Account anlegen</Typography>
                     </IconButton>
 
-                    <IconButton size='md' color='neutral' variant='soft' sx={{flex:1}} onClick={edit}>
+                    <IconButton size='md' color='neutral' variant='soft' sx={{flex:1}} onClick={handleEdit}>
                         <Typography>Editieren</Typography>
                     </IconButton>
 
@@ -139,23 +198,7 @@ export default function() {
 
     useEffect(() => {
         setSelected([]);
-    }, [selectedTab])
-
-    const toggleSelection = (account) => {
-        setSelected((prevSelected) =>
-            prevSelected.includes(account)
-                ? prevSelected.filter((item) => item !== account)
-                : [...prevSelected, account]
-        );
-    };
-
-    const selectAll = (accounts) => {
-        if (accounts.every((account) => selected.includes(account))) {
-            setSelected([]);
-        } else {
-            setSelected(accounts);
-        }
-    };
+    }, [selectedTab]);
 
     return (
         <Box
@@ -208,11 +251,11 @@ export default function() {
                     </TabList>
 
 
-                    <CustomTabPanel value={0} handleDelete={handleDelete} handleEdit={handleEdit} nID={5} selectAll={selectAll} toggleSelection={toggleSelection} selected={selected} accounts={serverData.accounts.filter((account) => account.authority < 10)} />
+                    <CustomTabPanel value={0} nID={5} selected={selected} accounts={serverData.accounts.filter((account) => account.authority < 10)} />
 
-                    <CustomTabPanel value={1} handleDelete={handleDelete} handleEdit={handleEdit} nID={15} selectAll={selectAll} toggleSelection={toggleSelection} selected={selected} accounts={serverData.accounts.filter((account) => account.authority >= 10 && account.authority < 20)} />
+                    <CustomTabPanel value={1} nID={15} selected={selected} accounts={serverData.accounts.filter((account) => account.authority >= 10 && account.authority < 20)} />
 
-                    <CustomTabPanel value={2} handleDelete={handleDelete} handleEdit={handleEdit} nID={25} selectAll={selectAll} toggleSelection={toggleSelection} selected={selected} accounts={serverData.accounts.filter((account) => account.authority >= 20)} />
+                    <CustomTabPanel value={2} nID={25} selected={selected} accounts={serverData.accounts.filter((account) => account.authority >= 20)} />
                 </Tabs>
             </Box>
         </Box>
