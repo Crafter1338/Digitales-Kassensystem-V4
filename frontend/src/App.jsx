@@ -4,17 +4,19 @@ import { useSidebar, useServerData, useMessage, useUser, useViewport, useHttp, u
 import LoginPage from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Accounts from './pages/Accounts';
+import Iventory from './pages/Inventory'
+import Identities from "./pages/Identities";
 
 import { useColorScheme } from "@mui/joy";
 import { useEffect } from "react";
-import Identities from "./pages/Identities";
 
 export default function() {
     const { mode, setMode } = useColorScheme();
-    const user = useUser();
+    const auth = useAuthenticate();
 
     useEffect(() => {
         setMode('system');
+        auth();
     }, []);
 
     return (
@@ -32,6 +34,11 @@ export default function() {
             <Route
                 path="/accounts"
                 element={<Accounts />}
+            />
+
+            <Route
+                path="/inventory"
+                element={<Iventory />}
             />
 
             <Route

@@ -13,7 +13,7 @@ export function UserProvider({ children }) {
 
     useEffect(() => {
         setUser(serverData.accounts.find(account => account._id == currentID));
-    }, [serverData])
+    }, [serverData.accounts])
 
     const use = (accountID) => {
         setCurrentID(accountID);

@@ -55,9 +55,11 @@ router.post('/:model/new', async (req, res) => {
     if (!model) return res.status(400).json({ error: "Invalid model" });
     
     try {
-        console.log(req.body)
+        if (req.body.password) {
+            req.body.password = await hashPassword(req.body.password);
+        }
 
-        req.body.password = await hashPassword(req.body.password);
+        console.log(req.body);
 
         const instance = new model(req.body);
         await instance.save();
@@ -99,9 +101,7 @@ router.post('/:model/update_many/:query', async (req, res) => {
     const query = parseQuery(req.params.query);
     if (!query) return res.status(400).json({ error: "Invalid query format" });
     
-    if (req.body.password.length == 0) {
-        delete req.body.password;;
-    }
+    //if (req.body.password?.length == 0) { delete req.body.password; }
 
     try {
         await model.updateMany(query, req.body);

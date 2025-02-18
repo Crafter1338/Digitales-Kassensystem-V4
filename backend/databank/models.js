@@ -2,8 +2,8 @@ import mongoose from 'mongoose';
 
 // schemas //
 const identitySchema = new mongoose.Schema({
-    cardID: { type: String, required: true, unique: true },
-    wardrobeID: { type: String, unique: true },
+    cardID: { type: Number, required: true, unique: true },
+    wardrobeID: { type: Number },
 
     accountID: { type: mongoose.Schema.Types.ObjectId, ref: 'Account' }, // dont propagate to client
 
@@ -54,9 +54,7 @@ const itemSchema = new mongoose.Schema({
     price: { type: Number, required: true },
     cost: { type: Number, default: 0 },
 
-    availableQuantity: { type: Number },
-    actualAvailableQuantity: { type: Number },
-    availableQuantity: { type: Number },
+    maxQuantity: { type: Number, default: 0 },
 
     totalQuantitySold: { type: Number, default: 0 },
     totalQuantityFetched: { type: Number, default: 0 },
@@ -113,7 +111,7 @@ identitySchema.pre('remove', async function (next) {
         );
 
         // log the deletion of transactions:
-        log(`Identität ${identityId} (${this.cardUID}) und alle zugehörigen Transaktionen wurden gelöscht`, identityId, true);
+        log(`Identität ${identityId} (${this.cardID}) und alle zugehörigen Transaktionen wurden gelöscht`, identityId, true);
 
         next();
     } catch (error) {

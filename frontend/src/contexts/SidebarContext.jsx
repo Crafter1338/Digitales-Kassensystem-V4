@@ -122,7 +122,7 @@ function Sidebar({ open }) {
                     textAlign: 'left',
                     justifyContent: 'flex-start',
                     width: 1,
-                }}>
+                }} onClick={() => handleNavigate('inventory')}>
                     Inventar
                 </Button>}
 

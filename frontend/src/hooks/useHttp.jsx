@@ -1,7 +1,10 @@
 import axios from 'axios';
 import APIEndpoint from '../API'
+import { useUser } from '../Hooks';
 
 export function useHttp() {
+    const user = useUser();
+
     return (method, url, payload) => {
         if (!url) { return Promise.reject(new Error('No URL')) }
 
