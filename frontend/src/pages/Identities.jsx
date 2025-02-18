@@ -161,7 +161,10 @@ function EditModal({ items, isShown, setIsShown, edit, selected }) {
         if (data.cardID.length != 0 && !isNaN(Number(data.cardID))) {
             data.cardID = Number(data.cardID);
 
-            data.wardrobeID = isNaN(Number(data.wardrobeID)) || data.wardrobeID.length == 0? undefined : Number(data.wardrobeID);
+            if (data.wardrobeID.length == 0) {data.wardrobeID = null} else {
+            data.wardrobeID = isNaN(Number(data.wardrobeID))? undefined : Number(data.wardrobeID);}
+            
+
             data.status = data.status.length == 0? '' : data.status;
 
             data.currentInventory = data.currentInventory.map(item => {
