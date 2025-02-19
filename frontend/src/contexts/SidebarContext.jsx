@@ -34,6 +34,12 @@ function Sidebar({ open }) {
     useEffect(() => {
         setDrawerSize('sm')
 
+        console.log(viewport);
+
+        if (viewport.isMd) {
+            setDrawerSize('md')
+        }
+
         if (viewport.isSm) {
             setDrawerSize('lg');
         }
@@ -45,7 +51,7 @@ function Sidebar({ open }) {
     }
 
     return (
-<Drawer open={open} size={drawerSize}>
+        <Drawer open={open} size={drawerSize}>
             <Box sx={{
                 m:2,
 
