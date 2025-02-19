@@ -289,98 +289,101 @@ export default function () {
 
     return (
         <Box sx={{
-            height:1,
+            display: 'flex',
+            flexDirection: 'column',
+            height: 1,
             width:1,
-
-            display:'flex',
-            flexDirection:'column',
+            overflow: 'hidden',
         }}>
             <Topbar />
-
+        
             <Box sx={{
-                height:1,
-
-                flex:1,
-                display:'flex',
-                mx:2
+                display: 'flex',
+                flexDirection: 'column',
+                flex: 1,
+                mx: 2,
+                overflow: 'hidden',
             }}>
                 <Sheet sx={{
-                    my:2,
-                    mx:'auto',
-
-                    px:2,
-                    py:2,
-
-                    borderRadius:'md',
-
-                    width:1,
-                    maxWidth:550,
-
-                    display:'flex',
-                    flexDirection:'column',
-
-                    gap:2,
+                    my: 2,
+                    mx: 'auto',
+                    px: 2,
+                    py: 2,
+                    borderRadius: 'md',
+                    width: 1,
+                    maxWidth: 550,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 2,
+                    flexGrow: 1,
+                    overflow: 'hidden',
                 }}>
-                    <Box sx={{display:'flex', flexDirection:'row', gap:1}}>
-                        <Input fullWidth placeholder='Suche: Name' onChange={(e) => setNameFilter(e.target.value)} value={nameFilter}></Input>
-                        <Input fullWidth placeholder='Suche: ID' onChange={(e) => setIdFilter(e.target.value)} value={idFilter}></Input>
-                    </Box> 
-
-                    <Box sx={{
-                        display:'flex',
-                        flexDirection:'row',
-                        gap: 1,
-                    }}>
-                        <Button sx={{flex: 1}} variant='soft' color={selectedTab == 0? 'primary':'neutral'} onClick={() => setSelectedTab(0)}>{viewport.isSm? 'SMV':'SMV Mitglieder'}</Button>
-                        <Button sx={{flex: 1}} variant='soft' color={selectedTab == 1? 'primary':'neutral'} onClick={() => setSelectedTab(1)}>{viewport.isSm? 'Admins':'Administratoren'}</Button>
-                        <Button sx={{flex: 1}} variant='soft' color={selectedTab == 2? 'primary':'neutral'} onClick={() => setSelectedTab(2)}>{viewport.isSm? 'Devs':'Entwickler'}</Button>
+                    <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
+                        <Input fullWidth placeholder='Suche: Name' onChange={(e) => setNameFilter(e.target.value)} value={nameFilter} />
+                        <Input fullWidth placeholder='Suche: ID' onChange={(e) => setIdFilter(e.target.value)} value={idFilter} />
                     </Box>
-
-                    <Table sx={{flex:1}}>
-                        <thead>
-                            <tr style={{display:'flex'}}>
-                                <th>
-                                    <Box sx={{ display: 'flex', justifyContent: 'left' }}>
-                                        <Checkbox checked={selected.length == filtered.length && selected.length != 0} onChange={toggleSelectAll}/>
-                                    </Box>
-                                </th>
-                                <th style={{ flex:1 }}>Name</th>
-                                <th style={{ flex:1 }}>Karten ID</th>
-                                <th style={{ flex:1 }}>Authorität</th>
-                            </tr>
-                        </thead>
- 
-                        <tbody>
-                            {filtered?.map((account, i) => {
-                                if (selectedTab == 0 && account.authority < 10) {
-                                    return (<AccountRow key={i} account={account} identities={serverData.identities} toggleSelection={toggleSelection} selected={selected}/>);
-                                }
-
-                                if (selectedTab == 1 && account.authority >= 10 && account.authority < 20) {
-                                    return (<AccountRow key={i} account={account} identities={serverData.identities} toggleSelection={toggleSelection} selected={selected}/>);
-                                }
-
-                                if (selectedTab == 2 && account.authority >= 20) {
-                                    return (<AccountRow key={i} account={account} identities={serverData.identities} toggleSelection={toggleSelection} selected={selected}/>);
-                                }
-                            })}
-                        </tbody>
-                    </Table>
-
+        
+                    <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
+                        <Button sx={{ flex: 1 }} variant='soft' color={selectedTab === 0 ? 'primary' : 'neutral'} onClick={() => setSelectedTab(0)}>{viewport.isSm ? 'SMV' : 'SMV Mitglieder'}</Button>
+                        <Button sx={{ flex: 1 }} variant='soft' color={selectedTab === 1 ? 'primary' : 'neutral'} onClick={() => setSelectedTab(1)}>{viewport.isSm ? 'Admins' : 'Administratoren'}</Button>
+                        <Button sx={{ flex: 1 }} variant='soft' color={selectedTab === 2 ? 'primary' : 'neutral'} onClick={() => setSelectedTab(2)}>{viewport.isSm ? 'Devs' : 'Entwickler'}</Button>
+                    </Box>
+        
                     <Box sx={{
-                        display:'flex',
-                        flexDirection:'row',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        flex: 1,
+                        overflowY: 'auto',
+                        '::-webkit-scrollbar': {
+                            display: 'none',
+                        },
+                    }}>
+                        <Table sx={{ width: '100%' }}>
+                            <thead>
+                                <tr style={{ display: 'flex' }}>
+                                    <th>
+                                        <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+                                            <Checkbox checked={selected.length === filtered.length && selected.length !== 0} onChange={toggleSelectAll} />
+                                        </Box>
+                                    </th>
+                                    <th style={{ flex: 1 }}>Name</th>
+                                    <th style={{ flex: 1 }}>Karten ID</th>
+                                    <th style={{ flex: 1 }}>Authorität</th>
+                                </tr>
+                            </thead>
+        
+                            <tbody>
+                                {filtered?.map((account, i) => {
+                                    if (selectedTab === 0 && account.authority < 10) {
+                                        return (<AccountRow key={i} account={account} identities={serverData.identities} toggleSelection={toggleSelection} selected={selected} />);
+                                    }
+        
+                                    if (selectedTab === 1 && account.authority >= 10 && account.authority < 20) {
+                                        return (<AccountRow key={i} account={account} identities={serverData.identities} toggleSelection={toggleSelection} selected={selected} />);
+                                    }
+        
+                                    if (selectedTab === 2 && account.authority >= 20) {
+                                        return (<AccountRow key={i} account={account} identities={serverData.identities} toggleSelection={toggleSelection} selected={selected} />);
+                                    }
+                                })}
+                            </tbody>
+                        </Table>
+                    </Box>
+        
+                    <Box sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
                         gap: 1,
                     }}>
-                        <Button sx={{flex: 1}} variant='soft' onClick={() => setShowCreateModal(true)}>Erstellen</Button>
-                        <Button sx={{flex: 1}} variant='soft' onClick={() => {if(selected.length == 0){return}; setShowEditModal(true)}}>Ändern</Button>
-                        <Button sx={{flex: 1}} variant='soft' color='danger' onClick={() => {if(selected.length == 0){return}; remove()}}>Löschen</Button>
+                        <Button sx={{ flex: 1 }} variant='soft' onClick={() => setShowCreateModal(true)}>Erstellen</Button>
+                        <Button sx={{ flex: 1 }} variant='soft' onClick={() => { if (selected.length === 0) { return; } setShowEditModal(true) }}>Ändern</Button>
+                        <Button sx={{ flex: 1 }} variant='soft' color='danger' onClick={() => { if (selected.length === 0) { return; } remove() }}>Löschen</Button>
                     </Box>
                 </Sheet>
-
-                <CreateModal accounts={serverData.accounts} identities={serverData.identities} isShown={showCreateModal} setIsShown={setShowCreateModal} create={create} selectedTab={selectedTab}/>
-                <EditModal accounts={serverData.accounts} identities={serverData.identities} isShown={showEditModal} setIsShown={setShowEditModal} edit={edit} selected={selected} selectedTab={selectedTab}/>
-            </Box> 
+        
+                <CreateModal accounts={serverData.accounts} identities={serverData.identities} isShown={showCreateModal} setIsShown={setShowCreateModal} create={create} selectedTab={selectedTab} />
+                <EditModal accounts={serverData.accounts} identities={serverData.identities} isShown={showEditModal} setIsShown={setShowEditModal} edit={edit} selected={selected} selectedTab={selectedTab} />
+            </Box>
         </Box>
     );
 }

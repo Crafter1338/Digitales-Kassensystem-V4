@@ -351,69 +351,70 @@ export default function () {
 
     return (
         <Box sx={{
-            height:1,
+            display: 'flex',
+            flexDirection: 'column',
+            height: 1,
             width:1,
-
-            display:'flex',
-            flexDirection:'column',
+            overflow: 'hidden',
         }}>
             <Topbar />
 
             <Box sx={{
-                height:1,
-
-                flex:1,
-                display:'flex',
-                mx:2
+                display: 'flex',
+                flexDirection: 'column',
+                flex: 1,
+                mx: 2,
+                overflow: 'hidden',
             }}>
                 <Sheet sx={{
-                    my:2,
-                    mx:'auto',
-
-                    px:2,
-                    py:2,
-
-                    borderRadius:'md',
-
-                    width:1,
-                    maxWidth:550,
-
-                    display:'flex',
-                    flexDirection:'column',
-
-                    gap:2,
-
-                    overflowY:'scroll',
-                    scrollbarWidth: 'none',
-                    '&::-webkit-scrollbar': {
-                        display: 'none',
-                    },
+                    my: 2,
+                    mx: 'auto',
+                    px: 2,
+                    py: 2,
+                    borderRadius: 'md',
+                    width: 1,
+                    maxWidth: 550,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 2,
+                    flexGrow: 1,
+                    overflow: 'hidden',
                 }}>
                     <Box sx={{display:'flex', flexDirection:'row', gap:1}}>
                         <Input fullWidth placeholder='Suche: ID' onChange={(e) => setFilter(e.target.value)} value={filter}></Input>
                     </Box> 
 
-                    <Table sx={{flex:1}}>
-                        <thead>
-                            <tr style={{display:'flex'}}>
-                                <th>
-                                    <Box sx={{ display: 'flex', justifyContent: 'left' }}>
-                                        <Checkbox checked={selected.length == filtered.length && selected.length != 0} onChange={toggleSelectAll}/>
-                                    </Box>
-                                </th>
-                                <th style={{ flex:1 }}>Karten ID</th>
-                                <th style={{ flex:1 }}>Account</th>
-                                <th style={{ flex:1 }}>Garderoben ID</th>
-                                <th style={{ flex:1 }}>Status</th>
-                            </tr>
-                        </thead>
+                    <Box sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        flex: 1,
+                        overflowY: 'auto',
+                        '::-webkit-scrollbar': {
+                            display: 'none',
+                        },
+                    }}>
+                        <Table sx={{flex:1}}>
+                            <thead>
+                                <tr style={{display:'flex'}}>
+                                    <th>
+                                        <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+                                            <Checkbox checked={selected.length == filtered.length && selected.length != 0} onChange={toggleSelectAll}/>
+                                        </Box>
+                                    </th>
+                                    <th style={{ flex:1 }}>Karten ID</th>
+                                    <th style={{ flex:1 }}>Account</th>
+                                    <th style={{ flex:1 }}>Garderoben ID</th>
+                                    <th style={{ flex:1 }}>Status</th>
+                                </tr>
+                            </thead>
 
-                        <tbody>
-                            {filtered.map((identity) => {
-                                return (<IdentityRow identity={identity} key={identity._id} toggleSelection={toggleSelection} selected={selected} />);
-                            })}
-                        </tbody>
-                    </Table>
+                            <tbody>
+                                {filtered.map((identity) => {
+                                    return (<IdentityRow identity={identity} key={identity._id} toggleSelection={toggleSelection} selected={selected} />);
+                                })}
+                            </tbody>
+                        </Table>
+                    </Box>
 
                     <Box sx={{
                         display:'flex',
