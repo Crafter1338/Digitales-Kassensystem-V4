@@ -208,18 +208,30 @@ export default function() {
 
     // client functions
     useEffect(() => {
+        let res;
         if (filter.length != 0) {
-            setFiltered(serverData.items.filter(item => item.name.toLowerCase().includes(filter.toLowerCase())));
+            res = serverData.items.filter(item => String(item.name).toLowerCase().includes(filter.toLowerCase()));
         } else {
-            setFiltered(serverData.items);
+            res = serverData.items;
         }
 
+        setFiltered(res);
+
+        setSelected(prev => {
+            return prev.filter(item => res.find(i => i._id == item._id))
+        })
     }, [serverData.items, filter]);
 
     useEffect(() => {
         const selectedIDs = selected.map(item => item._id)
         setSelected(serverData.items.filter(item => selectedIDs.includes(item._id)))
     }, [serverData.items]);
+
+    const authenticate = useAuthenticate();
+
+    useEffect(() => {
+        authenticate();
+    }, []);
 
     const toggleSelection = (item) => {
         if (selected.includes(item)){
@@ -244,18 +256,16 @@ export default function() {
 
     const edit = (data) => {
         const query = JSON.stringify({ _id: { $in: selected.map(item => item._id) } });
-        http('post', `/api/item/update_many/${query}`, data).then(() => {
-            setSelected([]);
-        }).catch(() => {
+        setSelected([]);
+        http('post', `/api/item/update_many/${query}`, data).catch(() => {
             message.write('Es ist ein Fehler aufgetreten');
         });
     }
 
     const remove = () => {
         const query = JSON.stringify({ _id: { $in: selected.map(item => item._id) } });
-        http('post', `/api/item/delete_many/${query}`, {}).then(() => {
-            setSelected([]);
-        }).catch(() => {
+        setSelected([]);
+        http('post', `/api/item/delete_many/${query}`, {}).catch(() => {
             message.write('Es ist ein Fehler aufgetreten');
         });
     }

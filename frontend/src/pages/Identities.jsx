@@ -284,11 +284,18 @@ export default function () {
 
     // client functions
     useEffect(() => {
+        let res;
         if (filter.length != 0) {
-            setFiltered(serverData.identities.filter(identity => String(identity.cardID).includes(filter.toLowerCase())));
+            res = serverData.identities.filter(identity => String(identity.cardID).includes(filter.toLowerCase()));
         } else {
-            setFiltered(serverData.identities);
+            res = serverData.identities;
         }
+
+        setFiltered(res);
+
+        setSelected(prev => {
+            return prev.filter(identity => res.find(i => i._id == identity._id))
+        })
 
     }, [serverData.identities, filter]);
 
@@ -296,6 +303,12 @@ export default function () {
         const selectedIDs = selected.map(identity => identity._id)
         setSelected(serverData.identities.filter(identity => selectedIDs.includes(identity._id)))
     }, [serverData.identities]);
+
+    const authenticate = useAuthenticate();
+
+    useEffect(() => {
+        authenticate();
+    }, []);
 
     const toggleSelection = (identity) => {
         if (selected.includes(identity)){
@@ -322,18 +335,16 @@ export default function () {
 
     const edit = (data) => {
         const query = JSON.stringify({ _id: { $in: selected.map(identity => identity._id) } });
-        http('post', `/api/identity/update_many/${query}`, data).then(() => {
-            setSelected([]);
-        }).catch(() => {
+        setSelected([]);
+        http('post', `/api/identity/update_many/${query}`, data).catch(() => {
             message.write('Es ist ein Fehler aufgetreten!', 'danger', 1500);
         });
     }
 
     const remove = () => {
         const query = JSON.stringify({ _id: { $in: selected.map(identity => identity._id) } });
-        http('post', `/api/identity/delete_many/${query}`, {}).then(() => {
-            setSelected([]);
-        }).catch(() => {
+        setSelected([]);
+        http('post', `/api/identity/delete_many/${query}`, {}).catch(() => {
             message.write('Es ist ein Fehler aufgetreten!', 'danger', 1500);
         });
     }

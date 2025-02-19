@@ -81,6 +81,10 @@ router.post('/:model/update_one/:query', async (req, res) => {
     const query = parseQuery(req.params.query);
     if (!query) return res.status(400).json({ error: "Invalid query format" });
     
+    if (req.body.password) {
+        req.body.password = await hashPassword(req.body.password);
+    }
+
     try {
         await model.updateOne(query, req.body);
         await reloadCacheForModel(model);
@@ -100,8 +104,12 @@ router.post('/:model/update_many/:query', async (req, res) => {
     
     const query = parseQuery(req.params.query);
     if (!query) return res.status(400).json({ error: "Invalid query format" });
-    
-    //if (req.body.password?.length == 0) { delete req.body.password; }
+
+    if (req.body.password) {
+        if (req.body.password?.length == 0) { delete req.body.password; } else {
+            req.body.password = await hashPassword(req.body.password);
+        }
+    }
 
     try {
         await model.updateMany(query, req.body);

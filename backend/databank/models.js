@@ -37,7 +37,7 @@ const accountSchema = new mongoose.Schema({
     name: { type: String, required: true, unique: true },
     password: { type: String, required: true },
 
-    identitityID: { type: mongoose.Schema.Types.ObjectId, ref: 'Identity' }, // dont propagate to client
+    identityID: { type: mongoose.Schema.Types.ObjectId, ref: 'Identity' }, // dont propagate to client
     authority: { type: Number, required: true },
 
     schedule: [
