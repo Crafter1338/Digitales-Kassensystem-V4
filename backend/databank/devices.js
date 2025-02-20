@@ -1,11 +1,10 @@
 class Device {
     constructor (deviceID, res) {
-        this.currentCardID  = null;
+        this.scanCardID     = null;
+        this.writeCardID    = null
         this.deviceID       = deviceID;
         this.mode           = 0; // Activator, Deactivator, Writer, Reader, Distributor, Checkout
         this.entryDetection = 0; // Entry, Exit, Switch, None
-
-        //imeplement sse subscribtion to req and res setup headers
 
         this.res = res;
     }
@@ -18,9 +17,19 @@ class Device {
         this.entryDetection = entryDetection;
     }
 
+    setScanCardID (cardID) {
+        this.scanCardID = cardID;
+    }
+
+    setWriteCardID (cardID) {
+        this.writeCardID = cardID;
+    }
+
     lean () {
         return {
-            currentCardID: this.currentCardID,
+            scanCardID: this.currentCardID,
+            writeCardID: this.writeCardID,
+
             deviceID: this.deviceID,
             mode: this.mode,
             entryDetection: this.entryDetection,
@@ -55,9 +64,12 @@ class Devices {
             this.devices.push(device);
         }
     
+        console.log(deviceID + ' connected')
+
         device.trigger();
     
         req.on('close', () => {
+            console.log(deviceID + ' disconnected')
             this.remove(deviceID);
         });
     }

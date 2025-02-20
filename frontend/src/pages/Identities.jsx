@@ -13,7 +13,7 @@ function IdentityRow({ accounts, identity, toggleSelection, selected }) {
                 </Box>
             </td>
             <td style={{ flex:1 }}>{identity.cardID}</td>
-            <td style={{ flex:1 }}>{accounts?.find(account => account?.identitityID == identity._id) || '-'}</td>
+            <td style={{ flex:1 }}>{accounts?.find(account => account?.identityID == identity._id)?.name || '-'}</td>
             <td style={{ flex:1 }}>{identity.wardrobeID || '-'}</td>
             <td style={{ flex:1 }}>{identity.status || '-'}</td>
         </tr>
@@ -410,7 +410,7 @@ export default function () {
 
                             <tbody>
                                 {filtered.map((identity) => {
-                                    return (<IdentityRow identity={identity} key={identity._id} toggleSelection={toggleSelection} selected={selected} />);
+                                    return (<IdentityRow identity={identity} key={identity._id} toggleSelection={toggleSelection} selected={selected} accounts={serverData.accounts}/>);
                                 })}
                             </tbody>
                         </Table>

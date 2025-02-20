@@ -61,25 +61,40 @@ router.get("/connect/account/:type/", async (req, res) => {
 });
 
 
-router.post('/scan/:id/:cardID', async (req, res) => {
-    res.status(200).send(JSON.stringify({}));
-
-    console.log(req.params.cardID)
-
+router.post('/scan/:id', async (req, res) => {
     let device = devices.get(Number(req.params.id))
-    device.currentCardID = Number(req.params.cardID);
 
-    console.log(device)
+    if (!device) { return res.status(200).json({}) }
+
+    device.setScanCardID(Number(req.body.cardID))
     device.trigger();
 
     if (device.mode == 0) {
         try {
-            let newIdentity = new identityModel({cardID: req.params.cardID});
+            let newIdentity = new identityModel({cardID: Number(req.body.cardID)});
             await newIdentity.save();
-        } catch {}
+
+            reloadCacheForModel(identityModel)
+        } catch(e) {console.log(e)}
     }
 
     reloadDevices();
+    return res.status(200).json({});
+})
+
+router.post('/write/:id', async (req, res) => {
+    console.log(req.body)
+
+    let device = devices.get(Number(req.params.id))
+
+    if (!device) { return res.status(200).json({}) }
+
+    device.setScanCardID(Number(req.body.cardID))
+    console.log(device)
+    device.trigger();
+
+    reloadDevices();
+    return res.status(200).json({});
 })
 
 router.get("/connect/device/:id", async (req, res) => {
