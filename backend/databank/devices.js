@@ -6,6 +6,9 @@ class Device {
         this.mode           = 0; // Activator, Deactivator, Writer, Reader, Distributor, Checkout
         this.entryDetection = 0; // Entry, Exit, Switch, None
 
+        this.name;
+        this.description;
+
         this.res = res;
     }
 
@@ -27,8 +30,11 @@ class Device {
 
     lean () {
         return {
-            scanCardID: this.currentCardID,
+            scanCardID: this.scanCardID,
             writeCardID: this.writeCardID,
+
+            name: this.name,
+            description: this.description,
 
             deviceID: this.deviceID,
             mode: this.mode,
@@ -84,6 +90,12 @@ class Devices {
 
     getAll () {
         return this.devices;
+    }
+
+    getAllLeaned () {
+        return this.devices.map((device) => {
+            return device.lean();
+        })
     }
 }
 

@@ -69,15 +69,50 @@ router.post('/scan/:id', async (req, res) => {
     device.setScanCardID(Number(req.body.cardID))
     device.trigger();
 
-    if (device.mode == 0) {
-        try {
-            let newIdentity = new identityModel({cardID: Number(req.body.cardID)});
-            await newIdentity.save();
+    switch (device.mode) {
+        case 0:
+            try {
+                let newIdentity = new identityModel({cardID: Number(req.body.cardID)});
+                await newIdentity.save();
+            } catch {}
 
-            reloadCacheForModel(identityModel)
-        } catch(e) {console.log(e)}
+            break;
+
+        case 1:
+            try {
+                await identityModel.deleteOne({cardID: Number(req.body.cardID)});
+            } catch {}
+
+            break;
     }
 
+    let identity = await identityModel.findOne({cardID: Number(req.body.cardID)});
+
+    if (identity) {
+        if (identity.entryTimestamp == 0 || !identity.entryTimestamp) {
+            identity.entryTimestamp = Date.now();
+        }
+    
+        identity.exitTimestamp = Date.now();
+    
+        switch (device.entryDetection) {
+            case 0:
+                identity.isOnSite = true;
+                break;
+            
+            case 1:
+                identity.isOnSite = false;
+                break;
+    
+            case 2:
+                identity.isOnSite = !identity.isOnSite;
+                break;
+        }
+
+        await identityModel.findByIdAndUpdate(identity._id, identity);
+    }
+
+    reloadCacheForModel(identityModel);
     reloadDevices();
     return res.status(200).json({});
 })
@@ -99,6 +134,7 @@ router.post('/write/:id', async (req, res) => {
 
 router.get("/connect/device/:id", async (req, res) => {
     devices.add(Number(req.params.id), req, res);
+    reloadDevices();
 });
 
 export default router;

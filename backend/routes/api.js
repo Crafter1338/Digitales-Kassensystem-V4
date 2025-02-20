@@ -2,7 +2,8 @@ import express from 'express';
 import { identityModel, accountModel, itemModel, scheduleEntryModel, eventModel, logEntryModel, transactionEntryModel }  from '../databank/models.js';
 
 import { hashPassword, verifyToken } from "../helpers/authorization.js";
-import { reloadCacheForModel } from '../databank/cache.js';
+import { reloadCacheForModel, reloadDevices } from '../databank/cache.js';
+import devices from '../databank/devices.js';
 
 const router = express.Router();
 
@@ -75,6 +76,24 @@ router.post('/:model/new', async (req, res) => {
 router.post('/:model/update_one/:query', async (req, res) => {
     if (!verify(req, res)) return;
     
+    if (req.params.model.toLowerCase() == 'devices') {
+        let device = devices.get(req.params.query);
+
+        if (device) {
+            device.name = req.body.name || '';
+            device.description = req.body.description || '';
+            device.mode = req.body.mode || 0;
+            device.entryDetection = req.body.entryDetection || 0;
+
+            device.scanCardID = null;
+
+            reloadDevices();
+            return res.status(200).json({});
+        }
+
+        return res.status(200).json({});
+    }
+
     const model = models[req.params.model.toLowerCase()];
     if (!model) return res.status(400).json({ error: "Invalid model" });
     

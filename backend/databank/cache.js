@@ -39,7 +39,7 @@ export const initializeCache = async () => {
             cache[cacheKey] = await model.find().lean();
         }
 
-        cache.devices = devices.getAll()
+        cache.devices = devices.getAllLeaned()
 
         console.log("Cache initialized.");
     } catch (error) {
@@ -67,7 +67,8 @@ export const reloadCacheForModel = async (model) => {
 
 export const reloadDevices = async () => {
     try {
-        cache.devices = devices.get()
+        console.log(devices.getAllLeaned())
+        cache.devices = devices.getAllLeaned()
         console.log("Cache updated for devices");
 
         // stream new cache to subscribers 

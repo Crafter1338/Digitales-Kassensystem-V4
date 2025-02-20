@@ -6,6 +6,8 @@ import Dashboard from './pages/Dashboard';
 import Accounts from './pages/Accounts';
 import Iventory from './pages/Inventory'
 import Identities from "./pages/Identities";
+import Devices from "./pages/Devices";
+import DevicePage from "./pages/DevicePage";
 
 import { useColorScheme } from "@mui/joy";
 import { useEffect } from "react";
@@ -24,6 +26,16 @@ export default function() {
             <Route
                 path="/login"
                 element={<LoginPage />}
+            />
+
+            <Route
+                path="/devices"
+                element={<Devices />}
+            />
+
+            <Route
+                path="/device/:deviceID"
+                element={<DevicePage />}
             />
 
             <Route
@@ -49,10 +61,6 @@ export default function() {
 
             <Route
                 path="/"
-                element={<Navigate to="/dashboard" replace/>}
-            />
-            <Route
-                path="*"
                 element={<Navigate to="/dashboard" replace/>}
             />
         </Routes>
