@@ -5,8 +5,6 @@ const identitySchema = new mongoose.Schema({
     cardID: { type: Number, required: true, unique: true },
     wardrobeID: { type: Number },
 
-    accountID: { type: mongoose.Schema.Types.ObjectId, ref: 'Account' }, // dont propagate to client
-
     currentInventory: [
         {
             reference: { type: mongoose.Schema.Types.ObjectId, ref: 'Item' },
