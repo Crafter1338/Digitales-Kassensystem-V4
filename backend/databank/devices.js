@@ -1,3 +1,5 @@
+import { reloadDevices } from "./cache.js";
+
 class Device {
     constructor (deviceID, res) {
         this.scanCardID     = null;
@@ -77,6 +79,7 @@ class Devices {
         req.on('close', () => {
             console.log(deviceID + ' disconnected')
             this.remove(deviceID);
+            reloadDevices();
         });
     }
 

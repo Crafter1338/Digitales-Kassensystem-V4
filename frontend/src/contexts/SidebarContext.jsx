@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useServerData, useMessage, useUser, useViewport, useHttp, useAuthenticate } from '../Hooks'
 
-import { Drawer, Box, Typography, Card, IconButton, Divider, Button, Table, CardActions } from '@mui/joy'
+import { Drawer, Box, Typography, Card, IconButton, Divider, Button, Table, CardActions, Modal, ModalDialog, Input, Textarea } from '@mui/joy'
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from "react-router-dom";
 
@@ -13,10 +13,34 @@ function formatted_date() {
            d.getMinutes().toString().padStart(2, '0')
 }
 
+function HelpModal ({ isShown, setIsShown }) {
+    const hide = () => setIsShown(false);
+    const [message, setMessage] = useState('')
+
+    return (
+        <Modal open={isShown} onClose={hide}>
+            <ModalDialog sx={{ display:'flex', flexDirection:'column' }}>
+                <Typography level="h4">Hilferuf:</Typography>
+                
+                <Box sx={{ display:'flex', flexDirection:'row', gap:1 }}>
+                    <Typography sx={{ flex:1 }}>Nachricht:</Typography>
+                    <Textarea sx={{ flex: 1, p:0, m:0, ml:1, pl:1, minHeight:100 }} value={message} onChange={(e) => setMessage(e.target.value)}/>
+                </Box>
+
+                <Box sx={{ display:'flex', flexDirection:'row', gap:1 }}>
+                    <Button fullWidth variant="soft">Absenden</Button>
+                    <Button fullWidth variant="soft" color="danger" onClick={hide}>Abbrechen</Button>
+                </Box>
+            </ModalDialog>
+        </Modal>
+    );
+}
 
 function Sidebar({ open }) {
     const viewport = useViewport();
     const user = useUser();
+
+    const [showHelpModal, setShowHelpModal] = useState(false);
 
     const [time, setTime] = useState(formatted_date(Date.now()))
     const [drawerSize, setDrawerSize] = useState('sm')
@@ -207,14 +231,14 @@ function Sidebar({ open }) {
 
                     <CardActions sx={{flexDirection:'column'}}>
                         <Box sx={{width:1, display:'flex', flexDirection:'row', gap:2}}>
-                            <Button sx={{width:1}} variant='soft'>Hilfe rufen</Button>
-                            <Button sx={{width:1}} variant='soft'>Status ändern</Button>
+                            <Button sx={{width:1}} variant='soft' onClick={() => setShowHelpModal(true)}>Hilfe rufen</Button>
                         </Box>
 
                         <Button sx={{width:1}} variant='soft' color='success'>Mein Schichtplan</Button>
                     </CardActions>
                 </Card>
             </Box>
+            <HelpModal isShown={showHelpModal} setIsShown={setShowHelpModal}/>
         </Drawer>
     );
 }
