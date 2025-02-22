@@ -12,6 +12,23 @@ class Device {
         this.description;
 
         this.res = res;
+
+        this.heartbeatInterval = null;
+        this.startHeartbeat();
+    }
+
+    startHeartbeat () {
+        this.stopHeartbeat();
+        this.heartbeatInterval = setInterval(() => {
+            this.trigger();
+        }, 10000); // Send heartbeat every 30 seconds
+    }
+
+    stopHeartbeat () {
+        if (this.heartbeatInterval) {
+            clearInterval(this.heartbeatInterval);
+            this.heartbeatInterval = null;
+        }
     }
 
     setMode (mode) {
@@ -78,6 +95,7 @@ class Devices {
     
         req.on('close', () => {
             console.log(deviceID + ' disconnected')
+            device.stopHeartbeat();
             this.remove(deviceID);
             reloadDevices();
         });
