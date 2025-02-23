@@ -61,7 +61,8 @@ router.get("/connect/account/:type/", async (req, res) => {
 });
 
 
-router.post('/scan/:id', async (req, res) => {
+router.post('/scan-uid/:id', async (req, res) => {
+    console.log(req.body)
     let device = devices.get(Number(req.params.id))
 
     if (!device) { return res.status(200).json({}) }

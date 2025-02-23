@@ -4,8 +4,30 @@ import { Box, Button, Card, CardActions, CardContent, Checkbox, Grid, IconButton
 import Topbar from '../components/Topbar';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import APIEndpoint from '../API';
+
 
 function ActivatorDeactivator({ device }) {
+    const serverData = useServerData();
+    const [cardID, setCardID] = useState(null);
+
+    useEffect(() => {
+        const handleScanEvent = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                
+                if (data.deviceID == device.deviceID) {
+                    setCardID(data.cardID);
+                }
+            } catch {}
+        }
+        serverData.eventSource.addEventListener("scan-uid", handleScanEvent)
+
+        return () => {
+            serverData.eventSource.removeEventListener("scan-uid", handleScanEvent);
+        };
+    }, [])
+
     return (
         <Box sx={{
             display: 'flex',
@@ -17,7 +39,7 @@ function ActivatorDeactivator({ device }) {
 
             overflow: 'hidden',
         }}>
-            <Card sx={{
+            {cardID && <Card sx={{
                 my: 'auto',
                 mx: 'auto',
                 p:2,
@@ -34,8 +56,8 @@ function ActivatorDeactivator({ device }) {
                 overflow: 'hidden',
             }}>
                 {device?.name && <Typography sx={{ textAlign:'center' }} level='h4'>{device?.name}:</Typography>}
-                <Typography level='h4' color={device?.mode == 0 && 'success' || device?.mode == 1 && 'danger'} sx={{ textAlign:'center' }}>{device?.scanCardID}</Typography>
-            </Card>
+                <Typography level='h4' color={device?.mode == 0 && 'success' || device?.mode == 1 && 'danger'} sx={{ textAlign:'center' }}>{cardID}</Typography>
+            </Card>}
         </Box>
     );
 }
@@ -71,7 +93,7 @@ export default function () {
         >
             <Topbar />
 
-            {(device?.mode == 0 || device?.mode == 1) && device?.scanCardID && <ActivatorDeactivator device={device} />}
+            {(device?.mode == 0 || device?.mode == 1) && <ActivatorDeactivator device={device} />}
         </Box>
     );
 }

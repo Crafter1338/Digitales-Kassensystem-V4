@@ -1,4 +1,6 @@
 import { identityModel, accountModel, itemModel, eventModel, scheduleEntryModel, transactionEntryModel, logEntryModel } from './models.js';
+import sse from '../server/sse.js';
+import devices from './devices.js';
 
 const cache = {
     identities: [],
@@ -21,7 +23,7 @@ const modelNameToCache = {
     LogEntry: 'logs',
 };
 
-export const initializeCache = async () => {
+const initializeCache = async () => {
     console.log("Initializing cache...");
     
     try {
@@ -37,7 +39,8 @@ export const initializeCache = async () => {
             cache[cacheKey] = await model.find().lean();
         }
 
-        cache.devices = devices.getAllLeaned()
+        cache.devices = devices.getAllLeaned();
+        sse.notify("cache", cache);
 
         console.log("Cache initialized.");
     } catch (error) {
@@ -45,7 +48,7 @@ export const initializeCache = async () => {
     }
 };
 
-export const reloadCacheForModel = async (model) => {
+const reloadCacheForModel = async (model) => {
     try {
         const cacheKey = modelNameToCache[model.modelName];
         if (!cacheKey) {
@@ -54,21 +57,25 @@ export const reloadCacheForModel = async (model) => {
         }
 
         cache[cacheKey] = await model.find().lean();
+        sse.notify("cache", cache);
+
         console.log(`Cache updated for ${model.modelName}`);
     } catch (error) {
         console.error(`Error reloading cache for ${model.modelName}:`, error);
     }
 };
 
-export const reloadDevices = async () => {
+const reloadDevices = async () => {
     try {
-        console.log(devices.getAllLeaned())
-        cache.devices = devices.getAllLeaned()
+        cache.devices = devices.getAllLeaned();
+        sse.notify("cache", cache);
+
         console.log("Cache updated for devices");
     } catch (error) {
         console.error("Error reloading cache for devices:", error);
     }
 };
 
-// Get cached data
-export const getCache = () => cache;
+const getCache = () => cache;
+
+export default { getCache, reloadCacheForModel, reloadDevices, initializeCache };

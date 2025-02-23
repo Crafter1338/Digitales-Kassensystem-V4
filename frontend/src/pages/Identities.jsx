@@ -297,6 +297,8 @@ export default function () {
             return prev.filter(identity => res.find(i => i._id == identity._id))
         })
 
+        console.log(filtered, serverData.identities);
+
     }, [serverData.identities, filter]);
 
     useEffect(() => {

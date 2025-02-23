@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import APIEndpoint from '../API'
+import APIEndpoint from '../API';
 
 const ServerDataContext = createContext();
 
@@ -13,14 +13,17 @@ export function ServerDataProvider({ children }) {
     const [scheduleEntries, setScheduleEntries] = useState([]);
     const [event, setEvent] = useState({});
 
-    useEffect(() => {
-        const dataEventSource = new EventSource(`${APIEndpoint}/action/connect/account/data`);
-        const helpEventSource = new EventSource(`${APIEndpoint}/action/connect/account/help`);
+    const [eventSource, setEventSource] = useState(null);
+    const [retries, setRetries] = useState(0);
 
-        dataEventSource.onmessage = (event) => {
+    const reconnectDelay = 800; // Delay between reconnection attempts (in ms)
+
+    useEffect(() => {
+        const es = new EventSource(`${APIEndpoint}/action/connect/account`);
+
+        const handleCacheEvent = async (event) => {
             try {
                 const data = JSON.parse(event.data);
-
                 setAccounts(data.accounts);
                 setIdentities(data.identities);
                 setItems(data.items);
@@ -29,40 +32,48 @@ export function ServerDataProvider({ children }) {
                 setScheduleEntries(data.scheduleEntries);
                 setLogs(data.logs);
                 setEvent(data.events[0]);
-
-                console.log(data.devices)
             } catch (error) {
                 console.error("Failed to process SSE message:", error);
             }
         };
 
-        helpEventSource.onmessage = (event) => {
-            try {
-                const data = JSON.parse(event.data);
-            } catch (error) {
-                console.error("Failed to process SSE message:", error);
-            }
-        }
+        es.addEventListener("cache", handleCacheEvent);
 
-
-        helpEventSource.onerror = (error) => {
+        es.onerror = (error) => {
             console.error("SSE connection error:", error);
-            helpEventSource.close();
-        }
-
-        dataEventSource.onerror = (error) => {
-            console.error("SSE connection error:", error);
-            dataEventSource.close();
+            es.close();
+            setRetries((prevRetries) => prevRetries + 1);
         };
+
+        es.onclose = () => {
+            console.log("SSE connection closed");
+            setRetries((prevRetries) => prevRetries + 1);
+        };
+
+        if (eventSource) {
+            eventSource.close();
+        }
+
+        if (retries > 0) {
+            setTimeout(() => {
+                const esRetry = new EventSource(`${APIEndpoint}/action/connect/account`);
+                setEventSource(esRetry);
+            }, reconnectDelay);
+        } else {
+            setEventSource(es);
+        }
 
         return () => {
-            dataEventSource.close();
-            helpEventSource.close();
-        }
-    }, [])
+            if (es) {
+                es.removeEventListener("cache", handleCacheEvent);
+                es.close();
+            }
+        };
+    }, [retries]);
 
     return (
         <ServerDataContext.Provider value={{
+            eventSource,
             accounts,
             identities,
             items,
