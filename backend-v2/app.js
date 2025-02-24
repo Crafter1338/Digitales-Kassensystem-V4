@@ -73,7 +73,6 @@ const server = net.createServer((socket) => {
 
             devices.add(deviceID, socket);
 
-            // Make sure any database updates don't block the event loop
             process.nextTick(() => {
                 cache.reloadDevices().catch(err => console.error("Cache reload error:", err));
             });
