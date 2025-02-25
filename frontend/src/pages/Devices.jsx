@@ -121,7 +121,7 @@ function DeviceBox({ device, setShowEdit, setEditID }) {
                 {device.description && <Typography>{device.description}</Typography>}
             </Box>
 
-            {user.current.authority > 10 && <CardContent>
+            {user?.current?.authority > 10 && <CardContent>
                 <Box sx={{ display:'flex', flexDirection:'row', gap:1 }}>
                     <Typography sx={{ flex: 1 }} level='body-sm'>Karten ID:</Typography>
                     <Typography sx={{ flex: 1 }} level='body-sm'>{device.scanCardID || '-'}</Typography>   
@@ -140,7 +140,7 @@ function DeviceBox({ device, setShowEdit, setEditID }) {
 
             <CardActions>
                 <Button fullWidth variant='soft' onClick={() => navigate(`/device/${device.deviceID}`)}>Öffnen</Button>
-                {user.current.authority > 10 && <Button fullWidth variant='soft' onClick={() => {setEditID(device.deviceID); setShowEdit(true)}}>Ändern</Button>}
+                {user?.current?.authority > 10 && <Button fullWidth variant='soft' onClick={() => {setEditID(device.deviceID); setShowEdit(true)}}>Ändern</Button>}
             </CardActions>
         </Card>
     );

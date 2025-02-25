@@ -27,16 +27,16 @@ function CreateModal({ items, isShown, setIsShown, create }) {
     const message = useMessage();
 
     const handleAction = () => {
-        if (data.cardID.length != 0 && !isNaN(Number(data.cardID))) {
+        if (data.cardID?.length != 0 && !isNaN(Number(data.cardID))) {
             data.cardID = Number(data.cardID);
 
-            data.wardrobeID = isNaN(Number(data.wardrobeID)) || data.wardrobeID.length == 0? undefined : Number(data.wardrobeID);
+            data.wardrobeID = isNaN(Number(data.wardrobeID)) || data.wardrobeID?.length == 0? undefined : Number(data.wardrobeID);
             data.status = data.status.length == 0? '' : data.status;
 
             data.currentInventory = data.currentInventory.map(item => {
                 return {
                     reference: String(item.reference),
-                    quantity: isNaN(Number(item.quantity)) || item.quantity.length == 0? 0 : Number(item.quantity),
+                    quantity: isNaN(Number(item.quantity)) || item.quantity?.length == 0? 0 : Number(item.quantity),
                 }
             })
 
@@ -142,7 +142,7 @@ function EditModal({ items, isShown, setIsShown, edit, selected }) {
 
     const handleAction = () => {
         if (selected.length > 1) {
-            data.status = data.status.length == 0? '' : data.status;
+            data.status = data.status?.length == 0? '' : data.status;
 
             data.currentInventory = data.currentInventory.map(item => {
                 return {
@@ -158,19 +158,19 @@ function EditModal({ items, isShown, setIsShown, edit, selected }) {
             return;
         }
 
-        if (data.cardID.length != 0 && !isNaN(Number(data.cardID))) {
+        if (data.cardID?.length != 0 && !isNaN(Number(data.cardID))) {
             data.cardID = Number(data.cardID);
 
             if (data.wardrobeID.length == 0) {data.wardrobeID = null} else {
             data.wardrobeID = isNaN(Number(data.wardrobeID))? undefined : Number(data.wardrobeID);}
             
 
-            data.status = data.status.length == 0? '' : data.status;
+            data.status = data.status?.length == 0? '' : data.status;
 
             data.currentInventory = data.currentInventory.map(item => {
                 return {
                     reference: String(item.reference),
-                    quantity: isNaN(Number(item.quantity)) || item.quantity.length == 0? 0 : Number(item.quantity),
+                    quantity: isNaN(Number(item.quantity)) || item.quantity?.length == 0? 0 : Number(item.quantity),
                 }
             })
 
@@ -259,7 +259,7 @@ function EditModal({ items, isShown, setIsShown, edit, selected }) {
                     </Box>
                 </Box>
 
-                <Box sx={{ display:'flex', flexDirection:'row', gap: 1 }}>
+                <Box sx={{ display:'flex', flexDirection:'row', gap: 1, mt:1 }}>
                     <Button onClick={handleAction} sx={{flex: 1}} variant='soft'>Speichern</Button>
                     <Button onClick={hide} sx={{flex: 1}} variant='soft' color='danger'>Abbrechen</Button>
                 </Box>

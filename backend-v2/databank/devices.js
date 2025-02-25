@@ -99,7 +99,7 @@ class Devices {
                 const parsed = JSON.parse(data.toString().trim());
                 const { action, payload } = parsed;
 
-                if (action === "scan") {
+                if (action == "scan") {
                     devices.get(deviceID)?.setScanCardID(payload.cardID);
                     await cache.reloadDevices();
 
