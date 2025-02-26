@@ -166,7 +166,7 @@ function Reader({ device }) {
     }
     , [serverData.identities])
 
-    const hide = () => { setCardID(null); setIdentity(null); }
+    const hide = () => { setCardID(null); setIdentity(null) }
 
     return (
         <Box sx={{
