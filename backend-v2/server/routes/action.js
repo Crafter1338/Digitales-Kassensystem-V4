@@ -8,9 +8,62 @@ import { comparePassword, generateToken, verifyToken } from "../../helpers/autho
 
 const router = express.Router();
 
-router.post("/performTransaction/:buyer/:seller", async (req, res) => {
+router.post("/performTransaction/:seller/:buyer", async (req, res) => {
+    const sellerID = req.params.seller;
+    const buyerID = req.params.buyer;
 
+    const seller = await accountModel.findById(sellerID);
+    const buyer = await identityModel.findById(buyerID);
+
+    if (!buyer || !seller){
+        return res.status(404).json({});
+    }
+
+    let total = 0;
+    const inventoryChanges = await Promise.all(
+        req.body.inventoryBefore.map(async (item, index) => {
+            const serverItem = await itemModel.findById(item.reference);
+
+            const difference = req.body.inventoryAfter[index].quantity - item.quantity;
+            total += Math.max(0, difference) * serverItem.price;
+    
+            serverItem.totalQuantitySold += Math.max(0, difference);
+            serverItem.totalQuantityFetched += Math.min(0, difference);
+    
+            await serverItem.save();
+    
+            return {
+                reference: item.reference,
+                quantity: difference,
+            };
+        })
+    );
+
+    let transaction = new transactionEntryModel({
+        buyer: buyerID,
+        seller: sellerID,
+
+        inventoryChanges: inventoryChanges,
+
+        totalPrice: Number(total) || 0,
+
+        timestamp: Date.now(),
+    });
+    await transaction.save();
+
+    console.log(inventoryChanges);    
+
+    buyer.currentInventory = req.body.inventoryAfter;
+    buyer.transactions.push({reference: transaction._id});
+
+    buyer.markModified("currentInventory");
+
+    await buyer.save();
+
+    await cache.reloadAllModels();
+    return res.status(200).json({});
 });
+
 
 router.post("/login", async (req, res) => {
     const account = await accountModel.findOne({name: req.body.name});

@@ -96,6 +96,7 @@ router.post('/:model/update_one/:query', async (req, res) => {
     if (!model) return res.status(400).json({ error: "Invalid model" });
     
     const query = parseQuery(req.params.query);
+    console.log(req.params.query);
     if (!query) return res.status(400).json({ error: "Invalid query format" });
     
     if (req.body.password) {

@@ -73,7 +73,14 @@ function Reader({ device }) {
     const [cardID, setCardID] = useState(null);
     const [identity, setIdentity] = useState(null);
 
-    const [data, setData] = useState({});
+    const [data, setData] = useState({
+        cardID: "",
+        wardrobeID: "",
+        status: "",
+        isOnSite: false,
+        currentInventory: [],
+    });
+    
 
     const http = useHttp();
     const user = useUser();
@@ -134,10 +141,20 @@ function Reader({ device }) {
                 wardrobeID: String(identity.wardrobeID || ''),
                 status: String(identity.status || ''),
 
+                isOnSite: identity.isOnSite || false,
+
                 currentInventory: serverData.items?.map(serverItem => ({
                     reference: serverItem._id,
                     quantity: String(identity.currentInventory.find(item => item.reference == serverItem._id)?.quantity || 0),
                 }))
+            });
+        } else {
+            setData({
+                cardID: "",
+                wardrobeID: "",
+                status: "",
+                isOnSite: false,
+                currentInventory: [],
             });
         }
     }, [serverData.items, cardID, identity])
@@ -191,9 +208,16 @@ function Reader({ device }) {
                                 onChange={(e) => setData(prev => ({...prev, status: e.target.value}) )}
                             />
                         </Box>
+
+                        <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center' }}>
+                            <Typography sx={{ flex: 1 }}>Auf Gelände:</Typography>
+                            <Checkbox sx={{ flex: 1, p: 0 }} checked={data.isOnSite} 
+                                onChange={(e) => setData(prev => ({...prev, isOnSite: e.target.checked}) )}
+                            />
+                        </Box>
                     </Box>
 
-                    <Box sx={{
+                    {user?.current?.authority > 10 && <Box sx={{
                             display:'flex',
                             flexDirection:'column', 
                             gap: 1,
@@ -208,7 +232,7 @@ function Reader({ device }) {
                         {data.currentInventory && serverData.items.map((serverItem, i) => (
                             <Box key={i} sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center' }}>
                                 <Typography sx={{ flex: 1 }}>{serverItem.name}</Typography>
-                                <Input sx={{ flex: 1, p: 0, ml:1, pl:1 }} value={data.currentInventory?.find(item => item.reference == serverItem._id)?.quantity} 
+                                <Input sx={{ flex: 1, p: 0, ml:1, pl:1 }} value={data.currentInventory?.find(item => item.reference == serverItem._id)?.quantity || "0"} 
                                     onChange={(e) => setData(prev => {
                                         const updatedInventory = prev.currentInventory?.filter(item => item.reference !== serverItem._id) || [];
                                         updatedInventory.push({
@@ -224,7 +248,7 @@ function Reader({ device }) {
                                 />
                             </Box>
                         ))}
-                    </Box>
+                    </Box>}
                 </Box>
 
                 <Box sx={{ display:'flex', flexDirection:'row', gap: 1, mt:1 }}>
@@ -268,6 +292,7 @@ function Register({ device }) {
     const http = useHttp(); 
     const viewport = useViewport();
     const confirmation = useActionConfirmation();
+    const message = useMessage();
 
     const [currentTimeString, setCurrentTimeString] = useState(formatted_date(Date.now()))
 
@@ -283,16 +308,16 @@ function Register({ device }) {
         return () => clearInterval(interval);
     }, []);
 
-    useEffect(() => {
-        const initInventory = (identity) => {
-            setInventory(serverData.items.map(serverItem => {
-                return {
-                    reference: serverItem._id,
-                    quantity: identity.currentInventory.find(item => item.reference == serverItem._id)?.quantity || 0,
-                }
-            }));
-        }
+    const initInventory = (identity) => {
+        setInventory(serverData.items.map(serverItem => {
+            return {
+                reference: serverItem._id,
+                quantity: identity.currentInventory.find(item => item.reference == serverItem._id)?.quantity || 0,
+            }
+        }));
+    }
 
+    useEffect(() => {
         const handleScanEvent = (event) => {
             try {
                 const data = JSON.parse(event.data);
@@ -311,6 +336,34 @@ function Register({ device }) {
             serverData.eventSource.removeEventListener("scan-uid", handleScanEvent);
         };
     }, []);
+
+    useEffect(() => {
+        const identity = serverData.identities.find(identity => identity.cardID == cardID);
+        
+        if (identity) {
+            setIdentity(identity);
+            initInventory(identity);
+        }
+    }, [serverData.identities])
+
+    const performTransaction = () => {
+        http('post', `/action/performTransaction/${user.current._id}/${identity._id}`, {
+            inventoryBefore: identity.currentInventory,
+            inventoryAfter: inventory,
+        }).then(() => {
+            setCardID(null); setIdentity(null); setInventory([]);
+        }).catch(() => {
+            message.write('Es ist ein Fehler aufgetreten!', 'danger', 1500);
+        });
+    }
+
+    const performPayout = () => {
+        http('post', `/api/identity/update_one/${JSON.stringify({_id: identity._id})}`, {currentInventory: []}).then(() => {
+            setCardID(null); setIdentity(null); setInventory([]);
+        }).catch(() => {
+            message.write('Es ist ein Fehler aufgetreten!', 'danger', 1500);
+        });
+    }
 
     return (
         <Box sx = {{
@@ -331,6 +384,13 @@ function Register({ device }) {
 
                 minWidth:240,
                 maxWidth:270,
+
+                overflowY: 'auto', 
+
+                scrollbarWidth: 'none',
+                '&::-webkit-scrollbar': {
+                    display: 'none',
+                },
             }}>
                 <Box sx={{
                     display:'flex',
@@ -383,7 +443,7 @@ function Register({ device }) {
                             <Typography sx={{ flex: 1 }}>
                                 {serverData.transactions.reduce((total, transaction) => {
                                     if (transaction.buyer == identity._id) {
-                                        total += transaction.amount;
+                                        total += transaction.totalPrice;
                                     }
                                     return total;
                                 }, 0)} €
@@ -393,10 +453,11 @@ function Register({ device }) {
                         <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center' }}>
                             <Typography sx={{ flex: 1 }}>Abs. Saldo:</Typography>
                             <Typography sx={{ flex: 1 }}>
-                                {serverData.transactions.reduce((total, transaction) => {
-                                    if (transaction.buyer == identity._id) {
-                                        total += transaction.amount;
-                                    }
+                                {identity.currentInventory.reduce((total, item) => {
+                                    const serverItem = serverData.items.find(serverItem => serverItem._id == item.reference);
+                                    const startItem = identity.startInventory.find(startItem => startItem.reference == item.reference) || { reference: item.reference, quantity: 0 }
+
+                                    total += Math.max(item.quantity - startItem.quantity, 0) * serverItem.price;
                                     return total;
                                 }, 0)} €
                             </Typography>
@@ -406,7 +467,7 @@ function Register({ device }) {
                     </Box>
 
                     <Button fullWidth variant='soft' color='danger'
-                    onClick={() => {confirmation.confirm('Bist du dir sicher, dass du auszahlen möchtest?', 'Ja!', () => {console.log("TEST")}, 'danger')}}>
+                    onClick={() => {confirmation.confirm('Bist du dir sicher, dass du auszahlen möchtest?', 'Ja!', performPayout, 'danger')}}>
                         Auszahlen
                     </Button></>}
                 </Box>
@@ -427,8 +488,8 @@ function Register({ device }) {
                             let total = 0;
 
                             inventory.forEach(item => {
-                                const identityItem = identity.currentInventory.find(identityItem => identityItem.reference == item.reference);
-                                const serverItem = serverData.items.find(serverItem => serverItem._id == item.reference);
+                                const identityItem = identity.currentInventory.find(identityItem => identityItem.reference == item.reference) || { reference: item.reference, quantity: 0 }
+                                const serverItem = serverData?.items?.find(serverItem => serverItem._id == item.reference);
 
                                 total += serverItem.price * Math.max(0, (item.quantity - identityItem.quantity));
                             });
@@ -439,7 +500,7 @@ function Register({ device }) {
 
                     <Box sx={{display:'flex', flexDirection:'column', gap:2}}>
                         <Button fullWidth variant='soft' color='success'
-                        onClick={() => {confirmation.confirm('Bist du dir sicher, dass du buchen möchtest?', 'Ja!', () => {console.log("TEST")}, 'success')}}>
+                        onClick={() => {confirmation.confirm('Bist du dir sicher, dass du buchen möchtest?', 'Ja!', performTransaction, 'success')}}>
                             Buchen
                         </Button>
 
@@ -483,7 +544,7 @@ function Register({ device }) {
                 {cardID && identity && <Grid container spacing={1}>
                     {serverData.items.map((serverItem, i) => {
                         const inventoryItem = inventory.find(item => item.reference == serverItem._id) || { reference: serverItem._id, quantity: 0 };
-                        const difference = inventoryItem.quantity - identity.currentInventory.find(item => item.reference == serverItem._id)?.quantity || 0;
+                        const difference = inventoryItem.quantity - (identity.currentInventory.find(item => item.reference == serverItem._id)?.quantity || 0);
 
                         return (<Grid xs={12} sm={6} md={4} lg={3} key={i}>
                             <Card variant="outlined">

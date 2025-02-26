@@ -23,6 +23,29 @@ const modelNameToCache = {
     LogEntry: 'logs',
 };
 
+const reloadAllModels = async () => {
+    try {
+        const models = [identityModel, accountModel, itemModel, eventModel, scheduleEntryModel, transactionEntryModel, logEntryModel];
+
+        for (const model of models) {
+            const cacheKey = modelNameToCache[model.modelName];
+            if (!cacheKey) {
+                console.warn(`Unknown model: ${model.modelName}, skipping cache reload.`);
+                continue;
+            }
+
+            cache[cacheKey] = await model.find().lean();
+        }
+
+        cache.devices = devices.getAllLeaned();
+        sse.notify("cache", cache);
+
+        console.log("Cache reloaded.");
+    } catch (error) {
+        console.error("Error reloading cache:", error);
+    }
+}
+
 const initializeCache = async () => {
     console.log("Initializing cache...");
     
@@ -78,4 +101,4 @@ const reloadDevices = async () => {
 
 const getCache = () => cache;
 
-export default { getCache, reloadCacheForModel, reloadDevices, initializeCache };
+export default { getCache, reloadCacheForModel, reloadAllModels, reloadDevices, initializeCache };

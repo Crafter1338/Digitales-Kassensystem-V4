@@ -163,7 +163,6 @@ function EditModal({ items, isShown, setIsShown, edit, selected }) {
 
             if (data.wardrobeID.length == 0) {data.wardrobeID = null} else {
             data.wardrobeID = isNaN(Number(data.wardrobeID))? undefined : Number(data.wardrobeID);}
-            
 
             data.status = data.status?.length == 0? '' : data.status;
 
@@ -188,6 +187,9 @@ function EditModal({ items, isShown, setIsShown, edit, selected }) {
             setData({
                 cardID: selected.length == 1? selected[0].cardID : undefined,
                 wardrobeID: selected.length == 1? selected[0].wardrobeID || '' : undefined,
+
+                isOnSite: selected.length == 1? selected[0].isOnSite : false,
+
                 status: String(selected[0].status || ''),
 
                 currentInventory: items?.map(serverItem => ({
@@ -221,6 +223,13 @@ function EditModal({ items, isShown, setIsShown, edit, selected }) {
                             <Typography sx={{ flex: 1 }}>Status:</Typography>
                             <Input sx={{ flex: 1, p: 0, ml:1, pl:1 }} value={data.status} 
                                 onChange={(e) => setData(prev => ({...prev, status: e.target.value}) )}
+                            />
+                        </Box>
+
+                        <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center' }}>
+                            <Typography sx={{ flex: 1 }}>Auf Gelände:</Typography>
+                            <Checkbox sx={{ flex: 1, p: 0 }} checked={data.isOnSite} 
+                                onChange={(e) => setData(prev => ({...prev, isOnSite: e.target.checked}) )}
                             />
                         </Box>
                     </Box>
@@ -296,8 +305,6 @@ export default function () {
         setSelected(prev => {
             return prev.filter(identity => res.find(i => i._id == identity._id))
         })
-
-        console.log(filtered, serverData.identities);
 
     }, [serverData.identities, filter]);
 

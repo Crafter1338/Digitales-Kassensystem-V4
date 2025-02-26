@@ -7,7 +7,7 @@ class Device {
         this.cardID         = null;
         this.deviceID       = deviceID;
         this.mode           = 0; // Activator, Deactivator, Writer, Reader, Distributor, Checkout
-        this.entryDetection = 0; // Entry, Exit, Switch, None
+        this.entryDetection = 3; // Entry, Exit, Switch, None
 
         this.name;
         this.description;
@@ -75,12 +75,22 @@ class Devices {
             this.devices.push(device);
         }
 
+        setInterval(() => {
+            device.trigger();
+        }, 10000);
+
         console.log(deviceID + ' connected');
 
         device.trigger();
         cache.reloadDevices();
 
         socket.on('end', async () => {
+            console.log(deviceID + ' disconnected');
+            this.remove(deviceID);
+            await cache.reloadDevices();
+        });
+
+        socket.on('close', async () => {
             console.log(deviceID + ' disconnected');
             this.remove(deviceID);
             await cache.reloadDevices();
@@ -101,7 +111,6 @@ class Devices {
 
                 if (action == "scan") {
                     devices.get(deviceID)?.setScanCardID(payload.cardID);
-                    await cache.reloadDevices();
 
                     switch (device.mode) {
                         case 0:
@@ -118,7 +127,7 @@ class Devices {
                             break;
                     }
 
-                    let identity = new identityModel({cardID: Number(payload.cardID)});
+                    let identity = (await identityModel.findOne({cardID: Number(payload.cardID)}) )?._doc;
 
                     if (identity) {
                         if (identity.entryTimestamp == 0 || !identity.entryTimestamp) { identity.entryTimestamp = Date.now() }
@@ -137,11 +146,12 @@ class Devices {
                                 identity.isOnSite = !identity.isOnSite;
                                 break;
                         }
-                
+
                         await identityModel.findByIdAndUpdate(identity._id, identity);
                     }
 
                     await cache.reloadCacheForModel(identityModel);
+                    await cache.reloadDevices();
                     sse.notify("scan-uid", { deviceID, ...payload });
                 }
             } catch (err) {
