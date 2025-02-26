@@ -420,7 +420,7 @@ function Register({ device }) {
 
                     {cardID && identity && <><Divider/>
 
-                    <Typography level='h4'>Kund*in: {identity.cardID}</Typography>
+                    <Typography level='h4'>Kund*in: {identity?.cardID}</Typography>
 
                     <Box sx={{
                         display:'flex',
@@ -430,19 +430,19 @@ function Register({ device }) {
                     }}>
                         <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center' }}>
                             <Typography sx={{ flex: 1 }}>Authorität:</Typography>
-                            <Typography sx={{ flex: 1 }}>{serverData.accounts?.find(account => account.identityID == identity._id)?.authority || '-'}</Typography>
+                            <Typography sx={{ flex: 1 }}>{serverData?.accounts?.find(account => account.identityID == identity._id)?.authority || '-'}</Typography>
                         </Box>
 
                         <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center' }}>
                             <Typography sx={{ flex: 1 }}>Status:</Typography>
-                            <Typography sx={{ flex: 1 }}>{identity.status || '-'} </Typography>
+                            <Typography sx={{ flex: 1 }}>{identity?.status || '-'} </Typography>
                         </Box>
 
                         <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center' }}>
                             <Typography sx={{ flex: 1 }}>Abs. Ausgaben:</Typography>
                             <Typography sx={{ flex: 1 }}>
                                 {serverData.transactions.reduce((total, transaction) => {
-                                    if (transaction.buyer == identity._id) {
+                                    if (transaction.buyer == identity?._id) {
                                         total += transaction.totalPrice;
                                     }
                                     return total;
@@ -454,10 +454,10 @@ function Register({ device }) {
                             <Typography sx={{ flex: 1 }}>Abs. Saldo:</Typography>
                             <Typography sx={{ flex: 1 }}>
                                 {identity.currentInventory.reduce((total, item) => {
-                                    const serverItem = serverData.items.find(serverItem => serverItem._id == item.reference);
-                                    const startItem = identity.startInventory.find(startItem => startItem.reference == item.reference) || { reference: item.reference, quantity: 0 }
+                                    const serverItem = serverData?.items?.find(serverItem => serverItem?._id == item?.reference);
+                                    const startItem = identity?.startInventory?.find(startItem => startItem?.reference == item?.reference) || { reference: item?.reference, quantity: 0 }
 
-                                    total += Math.max(item.quantity - startItem.quantity, 0) * serverItem.price;
+                                    total += Math.max(item?.quantity - startItem?.quantity, 0) * serverItem?.price;
                                     return total;
                                 }, 0)} €
                             </Typography>
@@ -488,10 +488,10 @@ function Register({ device }) {
                             let total = 0;
 
                             inventory.forEach(item => {
-                                const identityItem = identity.currentInventory.find(identityItem => identityItem.reference == item.reference) || { reference: item.reference, quantity: 0 }
-                                const serverItem = serverData?.items?.find(serverItem => serverItem._id == item.reference);
+                                const identityItem = identity?.currentInventory.find(identityItem => identityItem?.reference == item?.reference) || { reference: item?.reference, quantity: 0 }
+                                const serverItem = serverData?.items?.find(serverItem => serverItem?._id == item?.reference);
 
-                                total += serverItem.price * Math.max(0, (item.quantity - identityItem.quantity));
+                                total += serverItem?.price * Math.max(0, (item?.quantity - identityItem?.quantity));
                             });
 
                             return total;
@@ -542,7 +542,7 @@ function Register({ device }) {
             }}>
                 <Typography level='h4'>Inventar:</Typography>
                 {cardID && identity && <Grid container spacing={1}>
-                    {serverData.items.map((serverItem, i) => {
+                    {serverData?.items?.map((serverItem, i) => {
                         const inventoryItem = inventory.find(item => item.reference == serverItem._id) || { reference: serverItem._id, quantity: 0 };
                         const difference = inventoryItem.quantity - (identity.currentInventory.find(item => item.reference == serverItem._id)?.quantity || 0);
 
