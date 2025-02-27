@@ -20,20 +20,22 @@ router.post("/performTransaction/:seller/:buyer", async (req, res) => {
     }
 
     let total = 0;
+    const items = await itemModel.find({});
     const inventoryChanges = await Promise.all(
-        req.body.inventoryBefore.map(async (item, index) => {
-            const serverItem = await itemModel.findById(item.reference);
+        items.map(async (serverItem, index) => {
+            const before = req.body.inventoryBefore[index] || {reference: serverItem?.reference, quantity: 0};
+            const after = req.body.inventoryAfter[index] || {reference: serverItem?.reference, quantity: 0};
 
-            const difference = req.body.inventoryAfter[index].quantity - item.quantity;
-            total += Math.max(0, difference) * serverItem.price;
+            const difference = after.quantity - before.quantity;
+            total += Math.max(0, difference) * serverItem?.price;
     
             serverItem.totalQuantitySold += Math.max(0, difference);
-            serverItem.totalQuantityFetched += Math.min(0, difference);
+            serverItem.totalQuantityFetched += Math.abs(Math.min(0, difference))
     
             await serverItem.save();
     
             return {
-                reference: item.reference,
+                reference: serverItem._id,
                 quantity: difference,
             };
         })
@@ -51,11 +53,39 @@ router.post("/performTransaction/:seller/:buyer", async (req, res) => {
     });
     await transaction.save();
 
-    console.log(inventoryChanges);    
+    console.log(inventoryChanges);
 
     buyer.currentInventory = req.body.inventoryAfter;
     buyer.transactions.push({reference: transaction._id});
 
+    buyer.markModified("currentInventory");
+
+    await buyer.save();
+
+    await cache.reloadAllModels();
+    return res.status(200).json({});
+});
+
+router.post("/performPayout/:seller/:buyer", async (req, res) => {
+    const sellerID = req.params.seller;
+    const buyerID = req.params.buyer;
+
+    const seller = await accountModel.findById(sellerID);
+    const buyer = await identityModel.findById(buyerID);
+
+    if (!buyer || !seller){
+        return res.status(404).json({});
+    }
+
+    const items = await itemModel.find({});
+
+    items.forEach(async (serverItem, index) => {
+        serverItem.totalQuantitySold -= Math.max(0, (buyer.currentInventory[index]?.quantity || 0 - buyer.startInventory[index]?.quantity || 0));
+        await serverItem.save();
+    });
+
+    buyer.currentInventory = [];
+    buyer.transactions = [];
     buyer.markModified("currentInventory");
 
     await buyer.save();

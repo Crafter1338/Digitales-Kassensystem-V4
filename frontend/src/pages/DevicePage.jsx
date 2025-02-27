@@ -286,6 +286,14 @@ function Writer({ device }) {
 
 }
 
+function Wardrobe({ device }) {
+    return (
+        <Sheet>
+
+        </Sheet>
+    );
+}
+
 function Register({ device }) {
     const serverData = useServerData();
     const user = useUser();
@@ -323,10 +331,15 @@ function Register({ device }) {
                 const data = JSON.parse(event.data);
                 
                 if (data.deviceID == device.deviceID) {
-                    const identity = serverData.identities.find(identity => identity.cardID == data.cardID);
-                    setIdentity(identity);
-                    initInventory(identity);
+                    console.log(serverData.identities);
                     setCardID(data.cardID);
+                    const identity = serverData.identities.find(identity => identity.cardID == data.cardID) || null;
+
+                    setIdentity(identity);
+
+                    if (identity) {
+                        initInventory(identity);
+                    }
                 }
             } catch {}
         }
@@ -358,7 +371,7 @@ function Register({ device }) {
     }
 
     const performPayout = () => {
-        http('post', `/api/identity/update_one/${JSON.stringify({_id: identity._id})}`, {currentInventory: []}).then(() => {
+        http('post', `/action/performPayout/${user.current._id}/${identity._id}`, {}).then(() => {
             setCardID(null); setIdentity(null); setInventory([]);
         }).catch(() => {
             message.write('Es ist ein Fehler aufgetreten!', 'danger', 1500);
@@ -441,11 +454,14 @@ function Register({ device }) {
                         <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center' }}>
                             <Typography sx={{ flex: 1 }}>Abs. Ausgaben:</Typography>
                             <Typography sx={{ flex: 1 }}>
-                                {serverData.transactions.reduce((total, transaction) => {
+                                {identity.transactions.reduce((total, identityTransaction) => {
+                                    const transaction = serverData?.transactions?.find(transaction => transaction?._id == identityTransaction?.reference);
+
                                     if (transaction.buyer == identity?._id) {
                                         total += transaction.totalPrice;
                                     }
-                                    return total;
+
+                                    return !isNaN(total)? total : 0;
                                 }, 0)} €
                             </Typography>
                         </Box>
@@ -458,7 +474,8 @@ function Register({ device }) {
                                     const startItem = identity?.startInventory?.find(startItem => startItem?.reference == item?.reference) || { reference: item?.reference, quantity: 0 }
 
                                     total += Math.max(item?.quantity - startItem?.quantity, 0) * serverItem?.price;
-                                    return total;
+
+                                    return !isNaN(total)? total : 'ERROR';
                                 }, 0)} €
                             </Typography>
                         </Box>
@@ -480,7 +497,7 @@ function Register({ device }) {
 
                     gap:2,
                 }}>
-                    <Typography level='h4'>Transaktion: #1</Typography>
+                    <Typography level='h4'>Transaktion: #{identity.transactions?.length + 1}</Typography>
 
                     <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center' }}>
                         <Typography sx={{ flex: 1 }}>Betrag:</Typography>
@@ -554,7 +571,7 @@ function Register({ device }) {
                                     <Box>
                                         <Box sx={{ display:'flex', flexDirection:'row', gap:1 }}>
                                             <Typography sx={{ flex:1 }}>Verfügbar:</Typography>
-                                            <Typography sx={{ flex:1 }}>{serverItem?.maxQuantity - (Math.max(serverItem?.totalQuantitySold || 0, serverItem?.totalQuantityFetched || 0) || 0 + Math.max(0, difference))}</Typography>
+                                            <Typography sx={{ flex:1 }}>{serverItem?.maxQuantity - (Math.max(serverItem?.totalQuantitySold || 0, serverItem?.totalQuantityFetched || 0) + Math.max(0, difference))}</Typography>
                                         </Box>
 
                                         <Box sx={{ display:'flex', flexDirection:'row', gap:1 }}>
