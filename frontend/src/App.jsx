@@ -9,6 +9,8 @@ import Identities from "./pages/Identities";
 import Devices from "./pages/Devices";
 import DevicePage from "./pages/DevicePage";
 import Transactions from "./pages/Transactions";
+import ScheduleEditor from "./pages/ScheduleEditor";
+import MySchedule from "./pages/MySchedule";
 
 import { useColorScheme } from "@mui/joy";
 import { useEffect } from "react";
@@ -63,7 +65,6 @@ export default function() {
                 path="/transactions"
                 element={<Transactions />}
             />
-
 
             <Route
                 path="/"

@@ -156,7 +156,7 @@ function Sidebar({ open }) {
                     Inventar
                 </Button>}
 
-                {user.current?.authority && user.current.authority >= 10 && <Button variant='soft' color='neutral' sx={{ // mind. 10
+                {user.current?.authority && user.current.authority >= 10 && <Button disabled variant='soft' color='neutral' sx={{ // mind. 10
                     textAlign: 'left',
                     justifyContent: 'flex-start',
                     width: 1,
@@ -174,7 +174,7 @@ function Sidebar({ open }) {
                     Transaktionen
                 </Button>}
 
-                {user.current?.authority && user.current.authority >= 12 && <Button variant='soft' color='danger' sx={{ // mind. 12
+                {user.current?.authority && user.current.authority >= 12 && <Button disabled variant='soft' color='danger' sx={{ // mind. 12
                     textAlign: 'left',
                     justifyContent: 'flex-start',
                     width: 1,
@@ -210,7 +210,7 @@ function Sidebar({ open }) {
                         </Table>
                     </Box>
 
-                    <Box>
+                    {/*<Box>
                         <Typography level='title-md'>Nächste Schicht</Typography>
                         <Table>
                             <thead>
@@ -227,14 +227,14 @@ function Sidebar({ open }) {
                                 </tr>
                             </tbody>
                         </Table>
-                    </Box>
+                    </Box>*/}
 
                     <CardActions sx={{flexDirection:'column'}}>
                         <Box sx={{width:1, display:'flex', flexDirection:'row', gap:2}}>
                             <Button sx={{width:1}} variant='soft' onClick={() => setShowHelpModal(true)}>Hilfe rufen</Button>
                         </Box>
 
-                        <Button sx={{width:1}} variant='soft' color='success'>Mein Schichtplan</Button>
+                        <Button disabled sx={{width:1}} variant='soft' color='success'>Mein Schichtplan</Button>
                     </CardActions>
                 </Card>
             </Box>
