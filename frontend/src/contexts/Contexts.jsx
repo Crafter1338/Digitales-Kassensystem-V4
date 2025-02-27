@@ -3,7 +3,8 @@ import { ServerDataProvider } from "./ServerDataContext";
 import { SidebarProvider } from "./SidebarContext";
 import { UserProvider } from "./UserContext";
 import { ViewportProvider } from "./ViewportContext";
-import { ActionConfirmationProvider } from "./ActionConfirmation"; 
+import { ActionConfirmationProvider } from "./ActionConfirmationContext"; 
+import { HelpProvider } from "./HelpContext"; 
 
 export default function({ children }) {
     return (
@@ -13,7 +14,9 @@ export default function({ children }) {
                     <ServerDataProvider>
                         <UserProvider>
                             <SidebarProvider>
-                                {children}
+                                <HelpProvider>
+                                    {children}
+                                </HelpProvider>
                             </SidebarProvider>
                         </UserProvider>
                     </ServerDataProvider>

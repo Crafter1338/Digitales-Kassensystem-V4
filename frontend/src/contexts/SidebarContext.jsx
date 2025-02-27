@@ -17,18 +17,28 @@ function HelpModal ({ isShown, setIsShown }) {
     const hide = () => setIsShown(false);
     const [message, setMessage] = useState('')
 
+    const http = useHttp();
+    const user = useUser();
+    const messageC = useMessage();
+
+    const handleAction = () => {
+        http('post', '/action/request-help', { userID: user.current?._id, message }).then(() => {
+            messageC.write('Administratoren wurden benachrichtigt', 'success', 3000);
+            hide();
+        }).catch(() => {
+            messageC.write('Es ist ein Fehler aufgetreten', 'danger', 1500);
+        })
+    }
+
     return (
         <Modal open={isShown} onClose={hide}>
             <ModalDialog sx={{ display:'flex', flexDirection:'column' }}>
                 <Typography level="h4">Hilferuf:</Typography>
                 
-                <Box sx={{ display:'flex', flexDirection:'row', gap:1 }}>
-                    <Typography sx={{ flex:1 }}>Nachricht:</Typography>
-                    <Textarea sx={{ flex: 1, p:0, m:0, ml:1, pl:1, minHeight:100 }} value={message} onChange={(e) => setMessage(e.target.value)}/>
-                </Box>
+                <Textarea sx={{ flex: 1, m:0, minHeight:100, minWidth:300 }} value={message} onChange={(e) => setMessage(e.target.value)}/>
 
                 <Box sx={{ display:'flex', flexDirection:'row', gap:1 }}>
-                    <Button fullWidth variant="soft">Absenden</Button>
+                    <Button fullWidth variant="soft" onClick={handleAction}>Absenden</Button>
                     <Button fullWidth variant="soft" color="danger" onClick={hide}>Abbrechen</Button>
                 </Box>
             </ModalDialog>
@@ -57,8 +67,6 @@ function Sidebar({ open }) {
 
     useEffect(() => {
         setDrawerSize('sm')
-
-        console.log(viewport);
 
         if (viewport.isMd) {
             setDrawerSize('md')
@@ -124,14 +132,6 @@ function Sidebar({ open }) {
                     Geräte
                 </Button>
 
-                <Button variant='soft' color='neutral' sx={{ // ALLE
-                    textAlign: 'left',
-                    justifyContent: 'flex-start',
-                    width: 1,
-                }}>
-                    Hilferufe
-                </Button>
-
                 {user.current?.authority && user.current.authority > 10 && <Button variant='soft' color='neutral' sx={{ // mind. 10
                     textAlign: 'left',
                     justifyContent: 'flex-start',
@@ -170,7 +170,7 @@ function Sidebar({ open }) {
                     textAlign: 'left',
                     justifyContent: 'flex-start',
                     width: 1,
-                }}>
+                }} onClick={() => handleNavigate('transactions')}>
                     Transaktionen
                 </Button>}
 

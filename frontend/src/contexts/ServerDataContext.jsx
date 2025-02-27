@@ -54,14 +54,7 @@ export function ServerDataProvider({ children }) {
             eventSource.close();
         }
 
-        if (retries > 0) {
-            setTimeout(() => {
-                const esRetry = new EventSource(`${APIEndpoint}/action/connect/account`);
-                setEventSource(esRetry);
-            }, reconnectDelay);
-        } else {
-            setEventSource(es);
-        }
+        setEventSource(es);
 
         return () => {
             if (es) {

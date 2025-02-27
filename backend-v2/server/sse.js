@@ -18,7 +18,6 @@ const subscribe = (req, res) => {
 }
 
 const notify = (event, data) => {
-
     subscribers.forEach(({ res }) => {
         res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
     });

@@ -117,22 +117,24 @@ function Reader({ device }) {
     }
 
     useEffect(() => {
-        const handleScanEvent = (event) => {
-            try {
-                const data = JSON.parse(event.data);
-                
-                if (data.deviceID == device.deviceID) {
-                    setIdentity(serverData.identities.find(identity => identity.cardID == data.cardID));
-                    setCardID(data.cardID);
-                }
-            } catch {}
+        if (serverData?.eventSource) {
+            const handleScanEvent = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    
+                    if (data.deviceID == device.deviceID) {
+                        setIdentity(serverData.identities.find(identity => identity.cardID == data.cardID));
+                        setCardID(data.cardID);
+                    }
+                } catch {}
+            }
+            serverData.eventSource.addEventListener("scan-uid", handleScanEvent)
+    
+            return () => {
+                serverData.eventSource.removeEventListener("scan-uid", handleScanEvent);
+            };
         }
-        serverData.eventSource.addEventListener("scan-uid", handleScanEvent)
-
-        return () => {
-            serverData.eventSource.removeEventListener("scan-uid", handleScanEvent);
-        };
-    }, []);
+    }, [serverData.eventSource]);
 
     useEffect(() => {
         if (identity && cardID) {
@@ -286,14 +288,6 @@ function Writer({ device }) {
 
 }
 
-function Wardrobe({ device }) {
-    return (
-        <Sheet>
-
-        </Sheet>
-    );
-}
-
 function Register({ device }) {
     const serverData = useServerData();
     const user = useUser();
@@ -326,29 +320,31 @@ function Register({ device }) {
     }
 
     useEffect(() => {
-        const handleScanEvent = (event) => {
-            try {
-                const data = JSON.parse(event.data);
-                
-                if (data.deviceID == device.deviceID) {
-                    console.log(serverData.identities);
-                    setCardID(data.cardID);
-                    const identity = serverData.identities.find(identity => identity.cardID == data.cardID) || null;
+        if (serverData?.eventSource) {
+            const handleScanEvent = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    
+                    if (data.deviceID == device.deviceID) {
+                        console.log(serverData.identities);
+                        setCardID(data.cardID);
+                        const identity = serverData.identities.find(identity => identity.cardID == data.cardID) || null;
 
-                    setIdentity(identity);
+                        setIdentity(identity);
 
-                    if (identity) {
-                        initInventory(identity);
+                        if (identity) {
+                            initInventory(identity);
+                        }
                     }
-                }
-            } catch {}
-        }
-        serverData.eventSource.addEventListener("scan-uid", handleScanEvent)
+                } catch {}
+            }
+            serverData.eventSource.addEventListener("scan-uid", handleScanEvent)
 
-        return () => {
-            serverData.eventSource.removeEventListener("scan-uid", handleScanEvent);
-        };
-    }, []);
+            return () => {
+                serverData.eventSource.removeEventListener("scan-uid", handleScanEvent);
+            };
+        }
+    }, [serverData.eventSource]);
 
     useEffect(() => {
         const identity = serverData.identities.find(identity => identity.cardID == cardID);
@@ -360,7 +356,7 @@ function Register({ device }) {
     }, [serverData.identities])
 
     const performTransaction = () => {
-        http('post', `/action/performTransaction/${user.current._id}/${identity._id}`, {
+        http('post', `/action/perform-transaction/${user.current._id}/${identity._id}`, {
             inventoryBefore: identity.currentInventory,
             inventoryAfter: inventory,
         }).then(() => {
@@ -371,7 +367,7 @@ function Register({ device }) {
     }
 
     const performPayout = () => {
-        http('post', `/action/performPayout/${user.current._id}/${identity._id}`, {}).then(() => {
+        http('post', `/action/perform-payout/${user.current._id}/${identity._id}`, {}).then(() => {
             setCardID(null); setIdentity(null); setInventory([]);
         }).catch(() => {
             message.write('Es ist ein Fehler aufgetreten!', 'danger', 1500);

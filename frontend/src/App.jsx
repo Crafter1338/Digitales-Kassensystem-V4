@@ -8,6 +8,7 @@ import Iventory from './pages/Inventory'
 import Identities from "./pages/Identities";
 import Devices from "./pages/Devices";
 import DevicePage from "./pages/DevicePage";
+import Transactions from "./pages/Transactions";
 
 import { useColorScheme } from "@mui/joy";
 import { useEffect } from "react";
@@ -56,6 +57,11 @@ export default function() {
             <Route
                 path="/identities"
                 element={<Identities />}
+            />
+
+            <Route
+                path="/transactions"
+                element={<Transactions />}
             />
 
 

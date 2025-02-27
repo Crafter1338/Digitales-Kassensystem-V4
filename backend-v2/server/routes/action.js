@@ -8,7 +8,7 @@ import { comparePassword, generateToken, verifyToken } from "../../helpers/autho
 
 const router = express.Router();
 
-router.post("/performTransaction/:seller/:buyer", async (req, res) => {
+router.post("/perform-transaction/:seller/:buyer", async (req, res) => {
     const sellerID = req.params.seller;
     const buyerID = req.params.buyer;
 
@@ -66,7 +66,7 @@ router.post("/performTransaction/:seller/:buyer", async (req, res) => {
     return res.status(200).json({});
 });
 
-router.post("/performPayout/:seller/:buyer", async (req, res) => {
+router.post("/perform-payout/:seller/:buyer", async (req, res) => {
     const sellerID = req.params.seller;
     const buyerID = req.params.buyer;
 
@@ -93,6 +93,13 @@ router.post("/performPayout/:seller/:buyer", async (req, res) => {
     await cache.reloadAllModels();
     return res.status(200).json({});
 });
+
+
+router.post("/request-help", async (req, res) => {
+    sse.notify("help", req.body);
+
+    return res.status(200).json({});
+})
 
 
 router.post("/login", async (req, res) => {
